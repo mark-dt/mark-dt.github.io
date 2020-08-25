@@ -1,1 +1,285 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Audit Log analyser</title>
+    <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+        .collapsible {
+            background-color: white;
+            color: black;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: white;
+        }
+
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: white;
+            width: 100%;
+        }
+
+        .collapsible:after {
+            content: url("images/dropdownclosed.png");
+            transform: scale(.05);
+            widows: 20px;
+            height: 20px;
+            font-size: 13px;
+            color: white;
+            float: left;
+            margin-left: -65px;
+            margin-top: -35px;
+        }
+
+        .step2:after {
+            content: url("images/dropdownclosed.png");
+            transform: scale(.05);
+            widows: 20px;
+            height: 20px;
+            font-size: 13px;
+            color: white;
+            float: left;
+            margin-left: 60px;
+            margin-top: -35px;
+        }
+
+        .active:after {
+            content: url("images/dropdownopen.png");
+            transform: scale(.05);
+        }
+
+        .required:before {
+            content: "*";
+            color: red
+        }
+    </style>
+    <script type="text/javascript">
+
+        function hideAll() {
+
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                if (coll[i].classList.contains("active")) {
+                    coll[i].click();
+                }
+            }
+        }
+
+        function parseJSON(response) {
+            return response.json();
+        }
+
+        function fetchAuditLog() {
+
+            //document.getElementById("demo").innerHTML = "Hello World";
+            var tenant = document.getElementById("tenant").value;
+            var token = document.getElementById("token").value;
+            var time_frame = document.getElementById("time_frame").value;
+            var event_type = document.getElementById("event_type").value;
+
+            const response = fetch('https://' + tenant + '.live.dynatrace.com/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
+                method: "GET",
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": "Api-Token " + token
+                }
+            })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    displayLog(data)
+                });
+
+            //console.log(response)
+
+        }
+
+        // filters out all the different columns
+        function displayLog(data) {
+            var selector = document.getElementById("table");
+            selector.innerHTML = "";
+            // columns has the header of the table
+            var columns = [];
+            //var header = $('<tr/>'); 
+            var list = data.auditLogs
+
+            for (var i = 0; i < list.length; i++) {
+                var row = list[i];
+
+                for (var k in row) {
+                    if (!columns.includes(k)) {
+                        columns.push(k);
+                    }
+                }
+            }
+            //console.log(columns)
+            generateTableHead(selector, columns)
+            generateTable(selector, list)
+            return columns;
+        }
+
+        function generateTableHead(table, data) {
+            let thead = table.createTHead();
+            let row = thead.insertRow();
+            for (let key of data) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+            }
+        }
+
+        function generateTable(table, data) {
+            for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                    let cell = row.insertCell();
+                    if (key == 'timestamp') {
+                        //console.log(timeConverter(element[key]));
+                        timestamp = timeConverter(element[key]);
+                        let text = document.createTextNode(timestamp);
+                        cell.appendChild(text);
+                    }
+                    else {
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                    }
+                }
+            }
+        }
+
+    </script>
+
+
+
+</head>
+
+<body>
+
+    <div class="nav has-no-secondary">
+
+        <a class="nav__brand">
+            <img class="nav__logo" src="images/dynatrace-logo.svg" alt="dynatrace logo" />
+        </a>
+
+        <nav id="nav-bar-example1" class="nav__bar">
+        </nav>
+
+    </div>
+
+    <div id="main" style="margin-left: 50px; margin-top: 25px">
+
+        <div id="controls" style="width: 615px">
+
+            <div id="config_container" style=" width: 1000px; margin-left: 5px">
+
+                <h3 class="collapsible step1" style="width:220px">Step 1 - Config</h3>
+
+
+                <div style="width: 700px" class="content">
+
+                    <div id="tenant_container" style="float:left">
+                        <label for="tenant" class="label required">Tenant Id</label>
+                        <input style="width:150px;" type="text" class="inputfield"
+                            placeholder="xxxxxxxx.live.dynatrace.com" id="tenant" value="" />
+                    </div>
+
+                    <div id="token_container" style="float:left; margin-left: 5px">
+                        <label for="token" class="label required">API token</label>
+                        <input style="width:250px;" type="password" class="inputfield"
+                            placeholder="User session access needed" id="token" value="" />
+                    </div>
+                    <!--
+                    <div id="property_container" style="float:left; margin-left: 5px">
+                        <label for="tag" class="label required">Error property</label>
+                        <input style="width:150px;" type="text" class="inputfield" placeholder="Must be a string"
+                            id="error" value="" />
+                    </div>
+                    -->
+
+                    <br /><br /><br />
+
+                    <div id="tenant_container" style="float:left">
+                        <label for="tenant" class="label required">Time Frame</label>
+                        <input style="width:150px;" type="text" class="inputfield" placeholder="now-2d" id="time_frame"
+                            value="" />
+                    </div>
+
+                    <div id="margin_container" style="float:left; margin-left: 5px">
+                        <label for="margin" class="label required">Event Type</label>
+                        <select name="enventType" id="event_type">
+                            <option value="create">CREATE</option>
+                            <option value="delete">DELETE</option>
+                            <option value="general">GENERAL</option>
+                            <option value="login">LOGIN</option>
+                            <option value="logout">LOGOUT</option>
+                            <option value="read">READ</option>
+                            <option value="update">UPDATE</option>
+                        </select>
+                        <!--
+                        <input style="width:100px;" type="text" class="inputfield" placeholder="% percent" id="margin"
+                            value="" />
+                        -->
+                    </div>
+                    <!--
+                    <div id="conversion_container" style="float:left; margin-left: 5px;">
+                        <label for="conversion" class="label required">Conversion action</label>
+                        <input style="width:300px;" type="text" class="inputfield"
+                            placeholder="Exact name of the action" id="conversion" value="" />
+                    </div>
+                    -->
+                    <div id="fetchErrors_container" style="float: left; width: 90px; margin-left: 5px;">
+                        <button id="fetchErrors" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" onclick="fetchAuditLog()">Fetch Logs</button>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <br /><br />
+
+        </div>
+        <table id="table" class="table">
+        </table>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script type="text/javascript">
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            }
+
+            document.getElementsByClassName("collapsible")[0].click();
+        </script>
+</body>
+
+</html>
