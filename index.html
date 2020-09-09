@@ -99,7 +99,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     "Authorization": "Api-Token " + token
-                }
+                },
             })
                 .then(function (response) {
                     return response.json();
@@ -164,6 +164,25 @@
                 }
             }
         }
+
+
+
+        function filter() {
+            var filter_value = document.getElementById("filter_value").value;
+            var table = document.getElementById("table");
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                //iterate through rows
+                //rows would be accessed using the "row" variable assigned in the for loop
+                for (var j = 0, col; col = row.cells[j]; j++) {
+                    //iterate through columns
+                    //columns would be accessed using the "col" variable assigned in the for loop
+                        var text_content = row.textContent.toLowerCase();
+                        var search_val = filter_value.toLowerCase();
+                        row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
+                }
+            }
+        }
+
 
     </script>
 
@@ -245,13 +264,24 @@
                             placeholder="Exact name of the action" id="conversion" value="" />
                     </div>
                     -->
-                    <div id="fetchErrors_container" style="float: left; width: 90px; margin-left: 5px;">
+                    <div id="fetchAuditLog_container" style="float: left; width: 90px; margin-left: 5px;">
                         <button id="fetchErrors" style="margin-top: 24px" role="button" type="button"
                             class="btn btn--primary" onclick="fetchAuditLog()">Fetch Logs</button>
                     </div>
 
-                </div>
+                    <br /><br /><br />
+                    <div id="filter_container" style="float:left">
+                        <label for="tenant" class="label">Filter</label>
+                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name" id="filter_value"
+                            value="" />
+                    </div>
 
+                    <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
+                        <button id="filter" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" onclick="filter()">Search</button>
+                    </div>
+
+                </div>
 
             </div>
 
@@ -259,7 +289,7 @@
             <br /><br />
 
         </div>
-        <table id="table" class="table">
+        <table id="table" class="table data-table table-striped customers-list">
         </table>
         <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript">
