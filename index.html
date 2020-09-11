@@ -87,7 +87,6 @@
 
         function fetchAuditLog() {
 
-            //document.getElementById("demo").innerHTML = "Hello World";
             var tenant = document.getElementById("tenant").value;
             var token = document.getElementById("token").value;
             var time_frame = document.getElementById("time_frame").value;
@@ -107,7 +106,6 @@
                     displayLog(data)
                 });
 
-            //console.log(response)
 
         }
 
@@ -176,9 +174,9 @@
                 for (var j = 0, col; col = row.cells[j]; j++) {
                     //iterate through columns
                     //columns would be accessed using the "col" variable assigned in the for loop
-                        var text_content = row.textContent.toLowerCase();
-                        var search_val = filter_value.toLowerCase();
-                        row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
+                    var text_content = row.textContent.toLowerCase();
+                    var search_val = filter_value.toLowerCase();
+                    row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
                 }
             }
         }
@@ -272,8 +270,8 @@
                     <br /><br /><br />
                     <div id="filter_container" style="float:left">
                         <label for="tenant" class="label">Filter</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name" id="filter_value"
-                            value="" />
+                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name"
+                            id="filter_value" value="" />
                     </div>
 
                     <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
@@ -281,6 +279,11 @@
                             class="btn btn--primary" onclick="filter()">Search</button>
                     </div>
 
+                    <br /><br /><br />
+                    <div id="downloadButton_container" style="float: left; width: 90px; margin-left: 5px;">
+                        <button id="filter" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" onclick="exportTableToCSV('test.csv')">Download Log</button>
+                    </div>
                 </div>
 
             </div>
