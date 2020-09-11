@@ -86,6 +86,10 @@
         }
 
         function fetchAuditLog() {
+            var single_log = document.getElementById("showRule");
+            single_log.style.display = "none";
+            var table = document.getElementById("table");
+            table.style.display = "";
 
             var tenant = document.getElementById("tenant").value;
             var token = document.getElementById("token").value;
@@ -166,6 +170,10 @@
 
 
         function filter() {
+            var single_log = document.getElementById("showRule");
+            single_log.style.display = "none";
+            var table = document.getElementById("table");
+            table.style.display = "";
             var filter_value = document.getElementById("filter_value").value;
             var table = document.getElementById("table");
             for (var i = 1, row; row = table.rows[i]; i++) {
@@ -181,6 +189,41 @@
             }
         }
 
+        function analyseErrors() {
+            var table = document.getElementById("table");
+            table.style.display = "none";
+            var single_log = document.getElementById("showRule");
+            single_log.style.display = "";
+
+            var tenant = document.getElementById("tenant").value;
+            var token = document.getElementById("token").value;
+            var log_id = document.getElementById("log_id").value
+            //var single_error = document.getElementById("errorList").value;
+            //var original_single_error = single_error;
+            //single_error = single_error.replace(/"/g, '\"\"');
+
+            const response = fetch('https://' + tenant + '.live.dynatrace.com/api/v2/auditlogs/' + log_id, {
+                method: "GET",
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": "Api-Token " + token
+                }
+            })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    console.log(data);
+                    var str = JSON.stringify(data, null, 2); // spacing level = 2
+                    var nice = syntaxHighlight(str)
+                    //document.body.appendChild(document.createElement('pre')).innerHTML = nice;
+                    document.getElementById("showRule").innerHTML = "";
+                    document.getElementById("showRule").appendChild(document.createElement('pre')).innerHTML = nice;
+                    //document.getElementById("showRule").innerHTML = nice;
+                    //displayLog(data)
+                });
+
+        }
 
     </script>
 
@@ -286,33 +329,53 @@
                     </div>
                 </div>
 
-            </div>
+                <h3 id="step2head" class="collapsible step2" style="width:350px">Step 2 - Select Log</h3>
+
+                <div id="error_container"
+                    style="display: inline-block; width: 700px; margin-left: 5px" class="content">
 
 
-            <br /><br />
+                    <div id="filter_container" style="float:left">
+                        <label for="log_id" class="label">Log ID</label>
+                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name"
+                            id="log_id" value="" />
+                    </div>
+
+                    <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
+                        <button id="filter" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" onclick="analyseErrors()">Search</button>
+                    </div>
+
+                </div>
+
+
+                <br /><br />
+
+        <div id="showRule" class="text" style="width: 800px">
 
         </div>
-        <table id="table" class="table data-table table-striped customers-list">
-        </table>
-        <script type="text/javascript" src="js/main.js"></script>
-        <script type="text/javascript">
-            var coll = document.getElementsByClassName("collapsible");
-            var i;
+            </div>
+            <table id="table" class="table data-table table-striped customers-list">
+            </table>
+            <script type="text/javascript" src="js/main.js"></script>
+            <script type="text/javascript">
+                var coll = document.getElementsByClassName("collapsible");
+                var i;
 
-            for (i = 0; i < coll.length; i++) {
-                coll[i].addEventListener("click", function () {
-                    this.classList.toggle("active");
-                    var content = this.nextElementSibling;
-                    if (content.style.maxHeight) {
-                        content.style.maxHeight = null;
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + "px";
-                    }
-                });
-            }
+                for (i = 0; i < coll.length; i++) {
+                    coll[i].addEventListener("click", function () {
+                        this.classList.toggle("active");
+                        var content = this.nextElementSibling;
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                        }
+                    });
+                }
 
-            document.getElementsByClassName("collapsible")[0].click();
-        </script>
+                document.getElementsByClassName("collapsible")[0].click();
+            </script>
 </body>
 
 </html>
