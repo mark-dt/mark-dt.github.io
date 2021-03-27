@@ -329,8 +329,37 @@
                     </div>
                 </div>
 
-                <h3 id="step2head" class="collapsible step2" style="width:350px">Step 2 - Select Log</h3>
+                <h3 id="step2head" class="collapsible step2" style="width:350px">Step 2 - Select Dashboards</h3>
 
+                <div id="error_container"
+                    style="display: inline-block; width: 700px; margin-left: 5px" class="content">
+        <form>
+            <label for="framework">Select one or more Dashboard(s):</label>
+                    <br /><br />
+            <select id="framework" multiple>
+                <option value="1">Angular</option>
+                <option value="2">React</option>
+                <option value="3">Vue.js</option>
+                <option value="4">Ember.js</option>
+            </select>
+                    <br /><br />
+            <button id="btn"style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary">Upload dashboards</button>
+        </form>
+    </div>
+    <script>
+        const btn = document.querySelector('#btn');
+        const sb = document.querySelector('#framework');
+
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const selectedValues = [].filter
+                .call(sb.options, option => option.selected)
+                .map(option => option.text);
+            alert(selectedValues);
+            readFile(["./dasboards.txt"]);
+        };
+    </script>
                 <div id="error_container"
                     style="display: inline-block; width: 700px; margin-left: 5px" class="content">
 
