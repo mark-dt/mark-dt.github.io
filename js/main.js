@@ -127,24 +127,10 @@ function readFile(input) {
 }
 
 
-function getDashboardList() {
-    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.txt';
-    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.json';
-    const response = fetch(url, {
-        method: "GET",
-        mode: 'cors',
-    })
-        .then(function (response) {
-            return response.json();
-        }).then(function (data) {
-            //displayLog(data)
-            //console.log(data);
-            displayDashboardList(data)
-        });
-}
 
 function getSingleDashboard(name) {
-    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/' + name;
+    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards/' + name;
+    //https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards
     const response = fetch(url, {
         method: "GET",
         mode: 'cors',
