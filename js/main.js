@@ -110,26 +110,52 @@ function exportTableToCSV(filename) {
 
 
 function readFile(input) {
-  let file = input.files[0];
+    let file = input.files[0];
 
-  let reader = new FileReader();
+    let reader = new FileReader();
 
-  reader.readAsText(file);
+    reader.readAsText(file);
 
-  reader.onload = function() {
-    console.log(reader.result);
-  };
+    reader.onload = function () {
+        console.log(reader.result);
+    };
 
-  reader.onerror = function() {
-    console.log(reader.error);
-  };
+    reader.onerror = function () {
+        console.log(reader.error);
+    };
 
 }
 
+/*
+function pushDashboard(data) {
+    delete data['metadata'];
+    delete data['id'];
+    data['dashboardMetadata']['owner'] = 'mark.bley@dynatrace.com';
+    //data['dashboardMetadata']['shared'] = 'true';
+    //data['dashboardMetadata']['sharingDetails']['published'] = true;
+    console.log(data);
+    //ChromeSamples.log('Posting request to GitHub API...');
+    url = 'https://ggg43721.sprint.dynatracelabs.com/api/config/v1/dashboards/';
+    fetch(url, {
+        method: 'post',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Api-Token " + token
+        },
+        body: JSON.stringify(data)
+    }).then(function (response) {
 
+        console.log(response);
+        return response.json();
+    }).then(function (data) {
+        console.log(data['id']);
+    });
+}
 
 function getSingleDashboard(name) {
-    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards/' + name;
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards/' + name;
+    url = 'https://raw.githubusercontent.com/TechShady/Dynatrace-Dashboards/master/' + name;
     //https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards
     const response = fetch(url, {
         method: "GET",
@@ -139,30 +165,33 @@ function getSingleDashboard(name) {
             return response.json();
         }).then(function (data) {
             //displayLog(data)
-            console.log(data);
+            //data['owner'] = 'Dynatrace';
+            //console.log(data);
             //displayDashboardList(data)
+            pushDashboard(data)
         });
 }
 
-function displayDashboardList(data)
-{
-            var selector = document.getElementById("framework");
-            selector.innerHTML = "";
-            // columns has the header of the table
-            var columns = [];
-            //var header = $('<tr/>'); 
-            var list = data.list
+*/
 
-            //var x = document.getElementById("mySelect");
-            for (var i = 0; i < list.length; i++) {
-                var option = document.createElement("option");
-                option.text = list[i];
-                //var row = list[i];
-                selector.add(option)
-                //console.log(row);
-            }
-            //console.log(columns)
-            //generateTableHead(selector, columns)
-            //generateTable(selector, list)
-            return columns;
+function displayDashboardList(data) {
+    var selector = document.getElementById("framework");
+    selector.innerHTML = "";
+    // columns has the header of the table
+    var columns = [];
+    //var header = $('<tr/>'); 
+    var list = data.list
+
+    //var x = document.getElementById("mySelect");
+    for (var i = 0; i < list.length; i++) {
+        var option = document.createElement("option");
+        option.text = list[i];
+        //var row = list[i];
+        selector.add(option)
+        //console.log(row);
+    }
+    //console.log(columns)
+    //generateTableHead(selector, columns)
+    //generateTable(selector, list)
+    return columns;
 }

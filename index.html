@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
     <link rel="stylesheet" href="css/main.css" />
     <style>
+
         .collapsible {
             background-color: white;
             color: black;
@@ -66,6 +67,54 @@
             content: "*";
             color: red
         }
+
+        select {
+            resize: both;
+            overflow: auto;
+        }
+
+        .dashboard-list{
+            height: 600px;
+            width: auto;
+        }
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
     </style>
     <script type="text/javascript">
 
@@ -227,7 +276,8 @@
 
 function getDashboardList() {
     //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.txt';
-    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.json';
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.json';
+    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboard-list.json';
     const response = fetch(url, {
         method: "GET",
         mode: 'cors',
@@ -242,6 +292,9 @@ function getDashboardList() {
 }
 
 getDashboardList();
+
+
+
     </script>
 
 
@@ -250,6 +303,16 @@ getDashboardList();
 
 <body>
 
+            <!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>Some text in the Modal..</p>
+  </div>
+
+</div>
     <div class="nav has-no-secondary">
 
         <a class="nav__brand">
@@ -263,7 +326,7 @@ getDashboardList();
 
     <div id="main" style="margin-left: 50px; margin-top: 25px">
 
-        <div id="controls" style="width: 615px">
+        <div id="controls" style="width: 615px; height:1000px">
 
             <div id="config_container" style=" width: 1000px; margin-left: 5px">
 
@@ -294,27 +357,11 @@ getDashboardList();
                     <br /><br /><br />
 
                     <div id="tenant_container" style="float:left">
-                        <label for="tenant" class="label required">Time Frame</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="now-2d" id="time_frame"
+                        <label for="tenant" class="label required">Dashboard Owner</label>
+                        <input style="width:250px;" type="text" class="inputfield" placeholder="your.name@email.com" id="dash_owner"
                             value="" />
                     </div>
 
-                    <div id="margin_container" style="float:left; margin-left: 5px">
-                        <label for="margin" class="label required">Event Type</label>
-                        <select name="enventType" id="event_type">
-                            <option value="create">CREATE</option>
-                            <option value="delete">DELETE</option>
-                            <option value="general">GENERAL</option>
-                            <option value="login">LOGIN</option>
-                            <option value="logout">LOGOUT</option>
-                            <option value="read">READ</option>
-                            <option value="update">UPDATE</option>
-                        </select>
-                        <!--
-                        <input style="width:100px;" type="text" class="inputfield" placeholder="% percent" id="margin"
-                            value="" />
-                        -->
-                    </div>
                     <!--
                     <div id="conversion_container" style="float:left; margin-left: 5px;">
                         <label for="conversion" class="label required">Conversion action</label>
@@ -322,22 +369,6 @@ getDashboardList();
                             placeholder="Exact name of the action" id="conversion" value="" />
                     </div>
                     -->
-                    <div id="fetchAuditLog_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="fetchErrors" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="fetchAuditLog()">Fetch Logs</button>
-                    </div>
-
-                    <br /><br /><br />
-                    <div id="filter_container" style="float:left">
-                        <label for="tenant" class="label">Filter</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name"
-                            id="filter_value" value="" />
-                    </div>
-
-                    <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="filter" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="filter()">Search</button>
-                    </div>
 
                     <br /><br /><br />
                     <div id="downloadButton_container" style="float: left; width: 90px; margin-left: 5px;">
@@ -346,14 +377,14 @@ getDashboardList();
                     </div>
                 </div>
 
-                <h3 id="step2head" class="collapsible step2" style="width:350px">Step 2 - Select Dashboards</h3>
+                <h3 id="step2head" class="collapsible step2" style="width:350px ">Step 2 - Select Dashboards</h3>
 
                 <div id="error_container"
-                    style="display: inline-block; width: 700px; margin-left: 5px" class="content">
+                    style="display: inline-block; width: 700px; margin-left: 5px; height:2000px" class="content">
         <form>
             <label for="framework">Select one or more Dashboard(s):</label>
                     <br /><br />
-            <select id="framework" multiple>
+            <select class="dashboard-list" id="framework" multiple>
                 <!--
                 <option value="1">Angular</option>
                 <option value="2">React</option>
@@ -362,14 +393,15 @@ getDashboardList();
                 -->
             </select>
                     <br /><br />
-            <button id="btn"style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary">Upload dashboards</button>
+            <button id="btn" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" >Upload dashboards</button>
         </form>
-    </div>
     <script>
         const btn = document.querySelector('#btn');
         const sb = document.querySelector('#framework');
 
+// Get the modal
+var modal = document.getElementById("myModal");
         btn.onclick = (e) => {
             e.preventDefault();
             const selectedValues = [].filter
@@ -380,34 +412,87 @@ getDashboardList();
                 getSingleDashboard(selectedValues[i]);
             }
             //alert(selectedValues);
+  //modal.style.display = "block";
         };
+
+function pushDashboard(data) {
+            var tenant = document.getElementById("tenant").value;
+            var token = document.getElementById("token").value;
+            var owner = document.getElementById("dash_owner").value;
+    delete data['metadata'];
+    delete data['id'];
+    data['dashboardMetadata']['owner'] = owner;
+    //data['dashboardMetadata']['shared'] = 'true';
+    //data['dashboardMetadata']['sharingDetails']['published'] = true;
+    //console.log(data);
+    //ChromeSamples.log('Posting request to GitHub API...');
+
+    url = 'https://' + tenant + '.sprint.dynatracelabs.com/api/config/v1/dashboards';
+    console.log(token);
+    
+    fetch(url, {
+        method: 'post',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Api-Token " + token
+        },
+        body: JSON.stringify(data)
+    }).then(function (response) {
+
+        console.log(response);
+        return response.json();
+    }).then(function (data) {
+        console.log(data['id']);
+    });
+}
+
+function getSingleDashboard(name) {
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards/' + name;
+    //url = 'https://raw.githubusercontent.com/TechShady/Dynatrace-Dashboards/master/' + name;
+    url = 'https://raw.githubusercontent.com/mark-dt/Dynatrace-Dashboards/master/' + name;
+    //https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards
+    const response = fetch(url, {
+        method: "GET",
+        mode: 'cors',
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            //displayLog(data)
+            //data['owner'] = 'Dynatrace';
+            //console.log(data);
+            //displayDashboardList(data)
+            pushDashboard(data)
+        });
+}
+// Get the button that opens the modal
+//var btn00 = document.getElementById("btn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+/*
+// When the user clicks the button, open the modal 
+btn00.onclick = function() {
+  modal.style.display = "block";
+}
+*/
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
     </script>
-                <div id="error_container"
-                    style="display: inline-block; width: 700px; margin-left: 5px" class="content">
 
 
-                    <div id="filter_container" style="float:left">
-                        <label for="log_id" class="label">Log ID</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name"
-                            id="log_id" value="" />
-                    </div>
-
-                    <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="filter" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="analyseErrors()">Search</button>
-                    </div>
-
-                </div>
-
-
-                <br /><br />
-
-        <div id="showRule" class="text" style="width: 800px">
-
-        </div>
-            </div>
-            <table id="table" class="table data-table table-striped customers-list">
-            </table>
             <script type="text/javascript" src="js/main.js"></script>
             <script type="text/javascript">
                 var coll = document.getElementsByClassName("collapsible");
