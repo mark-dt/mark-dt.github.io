@@ -450,7 +450,7 @@ function pushDashboard(data) {
 function getSingleDashboard(name) {
     //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards/' + name;
     //url = 'https://raw.githubusercontent.com/TechShady/Dynatrace-Dashboards/master/' + name;
-    url = 'https://raw.githubusercontent.com/mark-dt/Dynatrace-Dashboards/master/' + name;
+    url = 'https://raw.githubusercontent.com/mark-dt/Dynatrace-Dashboards/master/' + name + '.json';
     //https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards
     const response = fetch(url, {
         method: "GET",
