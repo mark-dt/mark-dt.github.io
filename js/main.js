@@ -125,3 +125,58 @@ function readFile(input) {
   };
 
 }
+
+
+function getDashboardList() {
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.txt';
+    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.json';
+    const response = fetch(url, {
+        method: "GET",
+        mode: 'cors',
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            //displayLog(data)
+            //console.log(data);
+            displayDashboardList(data)
+        });
+}
+
+function getSingleDashboard(name) {
+    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/' + name;
+    const response = fetch(url, {
+        method: "GET",
+        mode: 'cors',
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            //displayLog(data)
+            console.log(data);
+            //displayDashboardList(data)
+        });
+}
+
+function displayDashboardList(data)
+{
+            var selector = document.getElementById("framework");
+            selector.innerHTML = "";
+            // columns has the header of the table
+            var columns = [];
+            //var header = $('<tr/>'); 
+            var list = data.list
+
+            //var x = document.getElementById("mySelect");
+            for (var i = 0; i < list.length; i++) {
+                var option = document.createElement("option");
+                option.text = list[i];
+                //var row = list[i];
+                selector.add(option)
+                //console.log(row);
+            }
+            //console.log(columns)
+            //generateTableHead(selector, columns)
+            //generateTable(selector, list)
+            return columns;
+}

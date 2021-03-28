@@ -337,10 +337,12 @@
             <label for="framework">Select one or more Dashboard(s):</label>
                     <br /><br />
             <select id="framework" multiple>
+                <!--
                 <option value="1">Angular</option>
                 <option value="2">React</option>
                 <option value="3">Vue.js</option>
                 <option value="4">Ember.js</option>
+                -->
             </select>
                     <br /><br />
             <button id="btn"style="margin-top: 24px" role="button" type="button"
@@ -352,12 +354,12 @@
         const sb = document.querySelector('#framework');
 
         btn.onclick = (e) => {
+        getDashboardList();
             e.preventDefault();
             const selectedValues = [].filter
                 .call(sb.options, option => option.selected)
                 .map(option => option.text);
             alert(selectedValues);
-            readFile(["./dasboards.txt"]);
         };
     </script>
                 <div id="error_container"
