@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>DT Dashboards</title>
+    <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+
+        .collapsible {
+            background-color: white;
+            color: black;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: white;
+        }
+
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: white;
+            width: 100%;
+        }
+
+        .collapsible:after {
+            content: url("images/dropdownclosed.png");
+            transform: scale(.05);
+            widows: 20px;
+            height: 20px;
+            font-size: 13px;
+            color: white;
+            float: left;
+            margin-left: -65px;
+            margin-top: -35px;
+        }
+
+        .step2:after {
+            content: url("images/dropdownclosed.png");
+            transform: scale(.05);
+            widows: 20px;
+            height: 20px;
+            font-size: 13px;
+            color: white;
+            float: left;
+            margin-left: 90px;
+            margin-top: -35px;
+        }
+
+        .active:after {
+            content: url("images/dropdownopen.png");
+            transform: scale(.05);
+        }
+
+        .required:before {
+            content: "*";
+            color: red
+        }
+
+        select {
+            resize: both;
+            overflow: auto;
+        }
+
+        .dashboard-list{
+            height: 600px;
+            width: auto;
+        }
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+    </style>
+    <script type="text/javascript">
+
+        function hideAll() {
+
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                if (coll[i].classList.contains("active")) {
+                    coll[i].click();
+                }
+            }
+        }
+
+        function parseJSON(response) {
+            return response.json();
+        }
+
+        function fetchAuditLog() {
+            var single_log = document.getElementById("showRule");
+            single_log.style.display = "none";
+            var table = document.getElementById("table");
+            table.style.display = "";
+
+            var tenant = document.getElementById("tenant").value;
+            var token = document.getElementById("token").value;
+            var time_frame = document.getElementById("time_frame").value;
+            var event_type = document.getElementById("event_type").value;
+
+            const response = fetch(tenant + '/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
+                method: "GET",
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": "Api-Token " + token
+                },
+            })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    displayLog(data)
+                });
+
+
+        }
+
+        // filters out all the different columns
+        function displayLog(data) {
+            var selector = document.getElementById("table");
+            selector.innerHTML = "";
+            // columns has the header of the table
+            var columns = [];
+            //var header = $('<tr/>'); 
+            var list = data.auditLogs
+
+            for (var i = 0; i < list.length; i++) {
+                var row = list[i];
+
+                for (var k in row) {
+                    if (!columns.includes(k)) {
+                        columns.push(k);
+                    }
+                }
+            }
+            //console.log(columns)
+            generateTableHead(selector, columns)
+            generateTable(selector, list)
+            return columns;
+        }
+
+        function generateTableHead(table, data) {
+            let thead = table.createTHead();
+            let row = thead.insertRow();
+            for (let key of data) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+            }
+        }
+
+        function generateTable(table, data) {
+            for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                    let cell = row.insertCell();
+                    if (key == 'timestamp') {
+                        //console.log(timeConverter(element[key]));
+                        timestamp = timeConverter(element[key]);
+                        let text = document.createTextNode(timestamp);
+                        cell.appendChild(text);
+                    }
+                    else {
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                    }
+                }
+            }
+        }
+
+
+
+        function filter() {
+            var single_log = document.getElementById("showRule");
+            single_log.style.display = "none";
+            var table = document.getElementById("table");
+            table.style.display = "";
+            var filter_value = document.getElementById("filter_value").value;
+            var table = document.getElementById("table");
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                //iterate through rows
+                //rows would be accessed using the "row" variable assigned in the for loop
+                for (var j = 0, col; col = row.cells[j]; j++) {
+                    //iterate through columns
+                    //columns would be accessed using the "col" variable assigned in the for loop
+                    var text_content = row.textContent.toLowerCase();
+                    var search_val = filter_value.toLowerCase();
+                    row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
+                }
+            }
+        }
+
+        function analyseErrors() {
+            var table = document.getElementById("table");
+            table.style.display = "none";
+            var single_log = document.getElementById("showRule");
+            single_log.style.display = "";
+
+            var tenant = document.getElementById("tenant").value;
+            var token = document.getElementById("token").value;
+            var log_id = document.getElementById("log_id").value
+            //var single_error = document.getElementById("errorList").value;
+            //var original_single_error = single_error;
+            //single_error = single_error.replace(/"/g, '\"\"');
+
+            const response = fetch('https://' + tenant + '.live.dynatrace.com/api/v2/auditlogs/' + log_id, {
+                method: "GET",
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": "Api-Token " + token
+                }
+            })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    console.log(data);
+                    var str = JSON.stringify(data, null, 2); // spacing level = 2
+                    var nice = syntaxHighlight(str)
+                    //document.body.appendChild(document.createElement('pre')).innerHTML = nice;
+                    document.getElementById("showRule").innerHTML = "";
+                    document.getElementById("showRule").appendChild(document.createElement('pre')).innerHTML = nice;
+                    //document.getElementById("showRule").innerHTML = nice;
+                    //displayLog(data)
+                });
+
+        }
+
+function getDashboardList() {
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.txt';
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards.json';
+    url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboard-list.json';
+    const response = fetch(url, {
+        method: "GET",
+        mode: 'cors',
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            //displayLog(data)
+            //console.log(data);
+            displayDashboardList(data)
+        });
+}
+
+getDashboardList();
+
+
+
+    </script>
+
+
+
+</head>
+
+<body>
+
+            <!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>Some text in the Modal..</p>
+  </div>
+
+</div>
+    <div class="nav has-no-secondary">
+
+        <a class="nav__brand">
+            <img class="nav__logo" src="images/dynatrace-logo.svg" alt="dynatrace logo" />
+        </a>
+
+        <nav id="nav-bar-example1" class="nav__bar">
+        </nav>
+
+    </div>
+
+    <div id="main" style="margin-left: 50px; margin-top: 25px">
+
+        <div id="controls" style="width: 615px; height:1000px">
+
+            <div id="config_container" style=" width: 1000px; margin-left: 5px">
+
+                <h3 class="collapsible step1" style="width:220px">Step 1 - Config</h3>
+
+
+                <div style="width: 700px" class="content">
+
+                    <div id="tenant_container" style="float:left">
+                        <label for="tenant" class="label required">Tenant Id</label>
+                        <input style="width:150px;" type="text" class="inputfield"
+                            placeholder="xxxxxxxx.live.dynatrace.com" id="tenant" value="" />
+                    </div>
+
+                    <div id="token_container" style="float:left; margin-left: 5px">
+                        <label for="token" class="label required">API token</label>
+                        <input style="width:250px;" type="password" class="inputfield"
+                            placeholder="Write config needed" id="token" value="" />
+                    </div>
+                    <!--
+                    <div id="property_container" style="float:left; margin-left: 5px">
+                        <label for="tag" class="label required">Error property</label>
+                        <input style="width:150px;" type="text" class="inputfield" placeholder="Must be a string"
+                            id="error" value="" />
+                    </div>
+                    -->
+
+                    <br /><br /><br />
+
+                    <div id="tenant_container" style="float:left">
+                        <label for="tenant" class="label required">Dashboard Owner</label>
+                        <input style="width:250px;" type="text" class="inputfield" placeholder="your.name@email.com" id="dash_owner"
+                            value="" />
+                    </div>
+
+                    <!--
+                    <div id="conversion_container" style="float:left; margin-left: 5px;">
+                        <label for="conversion" class="label required">Conversion action</label>
+                        <input style="width:300px;" type="text" class="inputfield"
+                            placeholder="Exact name of the action" id="conversion" value="" />
+                    </div>
+                    -->
+
+                </div>
+
+                <h3 id="step2head" class="collapsible step2" style="width:350px ">Step 2 - Select Dashboards</h3>
+
+                <div id="error_container"
+                    style="display: inline-block; width: 700px; margin-left: 5px; height:2000px" class="content">
+        <form>
+            <label for="framework">Select one or more Dashboard(s):</label>
+                    <br /><br />
+            <select class="dashboard-list" id="framework" multiple>
+                <!--
+                <option value="1">Angular</option>
+                <option value="2">React</option>
+                <option value="3">Vue.js</option>
+                <option value="4">Ember.js</option>
+                -->
+            </select>
+                    <br /><br />
+            <button id="btn" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" >Upload dashboards</button>
+        </form>
+    <script>
+        const btn = document.querySelector('#btn');
+        const sb = document.querySelector('#framework');
+
+// Get the modal
+var modal = document.getElementById("myModal");
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const selectedValues = [].filter
+                .call(sb.options, option => option.selected)
+                .map(option => option.text);
+            for (var i = 0; i < selectedValues.length; i++) {
+                //console.log(selectedValues[i]);
+                getSingleDashboard(selectedValues[i]);
+            }
+            //alert(selectedValues);
+  //modal.style.display = "block";
+        };
+
+function pushDashboard(data) {
+            var tenant = document.getElementById("tenant").value;
+            var token = document.getElementById("token").value;
+            var owner = document.getElementById("dash_owner").value;
+    delete data['metadata'];
+    delete data['id'];
+    data['dashboardMetadata']['owner'] = owner;
+    //data['dashboardMetadata']['shared'] = 'true';
+    //data['dashboardMetadata']['sharingDetails']['published'] = true;
+    //console.log(data);
+    //ChromeSamples.log('Posting request to GitHub API...');
+
+    url = tenant + '/api/config/v1/dashboards';
+    //console.log(data);
+    fetch(url, {
+        method: 'post',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": "Api-Token " + token
+        },
+        body: JSON.stringify(data)
+    }).then(function (response) {
+
+        console.log(response);
+        return response.json();
+    }).then(function (data) {
+        console.log(data['id']);
+    });
+}
+
+function getSingleDashboard(name) {
+    //url = 'https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards/' + name;
+    //url = 'https://raw.githubusercontent.com/TechShady/Dynatrace-Dashboards/master/' + name;
+    url = 'https://raw.githubusercontent.com/mark-dt/Dynatrace-Dashboards/master/' + name + '.json';
+    //https://raw.githubusercontent.com/mark-dt/mark-dt.github.io/dashboards/dashboards
+    const response = fetch(url, {
+        method: "GET",
+        mode: 'cors',
+    })
+        .then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            //displayLog(data)
+            //data['owner'] = 'Dynatrace';
+            //console.log(data);
+            //displayDashboardList(data)
+            pushDashboard(data)
+        });
+}
+// Get the button that opens the modal
+//var btn00 = document.getElementById("btn");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+/*
+// When the user clicks the button, open the modal 
+btn00.onclick = function() {
+  modal.style.display = "block";
+}
+*/
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+    </script>
+
+
+            <script type="text/javascript" src="js/main.js"></script>
+            <script type="text/javascript">
+                var coll = document.getElementsByClassName("collapsible");
+                var i;
+
+                for (i = 0; i < coll.length; i++) {
+                    coll[i].addEventListener("click", function () {
+                        this.classList.toggle("active");
+                        var content = this.nextElementSibling;
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                        } else {
+                            content.style.maxHeight = content.scrollHeight + "px";
+                        }
+                    });
+                }
+
+                document.getElementsByClassName("collapsible")[0].click();
+            </script>
+</body>
+
+</html>

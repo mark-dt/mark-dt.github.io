@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JavaScript Select Box</title>
+    <link rel="stylesheet" href="css/selectbox.css">
+</head>
+<body>
+    <div id="container">
+        <form>
+            <label for="framework">Select one or more JS Frameworks:</label>
+            <select id="framework" multiple>
+                <option value="1">Angular</option>
+                <option value="2">React</option>
+                <option value="3">Vue.js</option>
+                <option value="4">Ember.js</option>
+            </select>
+            <button id="btn">Get Selected Frameworks</button>
+        </form>
+    </div>
+    <script>
+        const btn = document.querySelector('#btn');
+        const sb = document.querySelector('#framework');
+
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const selectedValues = [].filter
+                .call(sb.options, option => option.selected)
+                .map(option => option.text);
+            alert(selectedValues);
+        };
+    </script>
+</body>
+</html>
