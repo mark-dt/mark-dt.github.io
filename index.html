@@ -4,7 +4,7 @@
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
-    <title>Audit Log analyser</title>
+    <title>DT Dashboards</title>
     <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
     <link rel="stylesheet" href="css/main.css" />
     <style>
@@ -54,7 +54,7 @@
             font-size: 13px;
             color: white;
             float: left;
-            margin-left: 60px;
+            margin-left: 90px;
             margin-top: -35px;
         }
 
@@ -145,7 +145,7 @@
             var time_frame = document.getElementById("time_frame").value;
             var event_type = document.getElementById("event_type").value;
 
-            const response = fetch('https://' + tenant + '.live.dynatrace.com/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
+            const response = fetch(tenant + '/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
                 method: "GET",
                 mode: 'cors',
                 headers: {
@@ -344,7 +344,7 @@ getDashboardList();
                     <div id="token_container" style="float:left; margin-left: 5px">
                         <label for="token" class="label required">API token</label>
                         <input style="width:250px;" type="password" class="inputfield"
-                            placeholder="User session access needed" id="token" value="" />
+                            placeholder="Write config needed" id="token" value="" />
                     </div>
                     <!--
                     <div id="property_container" style="float:left; margin-left: 5px">
@@ -370,11 +370,6 @@ getDashboardList();
                     </div>
                     -->
 
-                    <br /><br /><br />
-                    <div id="downloadButton_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="filter" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="exportTableToCSV('test.csv')">Download Log</button>
-                    </div>
                 </div>
 
                 <h3 id="step2head" class="collapsible step2" style="width:350px ">Step 2 - Select Dashboards</h3>
@@ -427,8 +422,8 @@ function pushDashboard(data) {
     //console.log(data);
     //ChromeSamples.log('Posting request to GitHub API...');
 
-    url = 'https://' + tenant + '.sprint.dynatracelabs.com/api/config/v1/dashboards';
-    
+    url = tenant + '/api/config/v1/dashboards';
+    //console.log(data);
     fetch(url, {
         method: 'post',
         mode: 'cors',
