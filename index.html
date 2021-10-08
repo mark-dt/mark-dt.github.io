@@ -101,6 +101,9 @@
 
             var token = document.getElementById("token").value;
             var time_frame = document.getElementById("time_frame").value;
+            if (time_frame == "") {
+                time_frame = "now-2d";
+            }
             var event_type = document.getElementById("event_type").value;
 
             const response = fetch(tenant + '/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
@@ -225,7 +228,7 @@
                 .then(function (response) {
                     return response.json();
                 }).then(function (data) {
-                    console.log(data);
+                    //console.log(data);
                     var str = JSON.stringify(data, null, 2); // spacing level = 2
                     var nice = syntaxHighlight(str)
                     //document.body.appendChild(document.createElement('pre')).innerHTML = nice;
@@ -273,9 +276,9 @@
                             placeholder="xxxxxxxx.live.dynatrace.com" id="tenant" value="" />
                     </div>
                     <br /><br /><br />
-                    <div id="token_container" style="float:left; margin-left: 5px">
+                    <div id="token_container" style="float:left">
                         <label for="token" class="label required">API token</label>
-                        <input style="width:250px;" type="password" class="inputfield"
+                        <input style="width:350px;" type="password" class="inputfield"
                             placeholder="User session access needed" id="token" value="" />
                     </div>
                     <!--
@@ -293,6 +296,7 @@
                         <input style="width:150px;" type="text" class="inputfield" placeholder="now-2d" id="time_frame"
                             value="" />
                     </div>
+                    <br /><br /><br />
 
                     <div id="margin_container" style="float:left; margin-left: 5px">
                         <label for="margin" class="label required">Event Type</label>
@@ -310,6 +314,7 @@
                             value="" />
                         -->
                     </div>
+                    <br /><br />
                     <!--
                     <div id="conversion_container" style="float:left; margin-left: 5px;">
                         <label for="conversion" class="label required">Conversion action</label>
