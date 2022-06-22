@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <title>Dynatrace Extension Config</title>
+    <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+        .collapsible {
+            background-color: white;
+            color: black;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: white;
+        }
+
+        .content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            background-color: white;
+            width: 100%;
+        }
+
+        .collapsible:after {
+            content: url("images/dropdownclosed.png");
+            transform: scale(.05);
+            widows: 20px;
+            height: 20px;
+            font-size: 13px;
+            color: white;
+            float: left;
+            margin-left: -65px;
+            margin-top: -35px;
+        }
+
+        .step2:after {
+            content: url("images/dropdownclosed.png");
+            transform: scale(.05);
+            widows: 20px;
+            height: 20px;
+            font-size: 13px;
+            color: white;
+            float: left;
+            margin-left: 60px;
+            margin-top: -35px;
+        }
+
+        .active:after {
+            content: url("images/dropdownopen.png");
+            transform: scale(.05);
+        }
+
+        .required:before {
+            content: "*";
+            color: red
+        }
+    </style>
+    <script type="text/javascript">
+
+        function hideAll() {
+
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                if (coll[i].classList.contains("active")) {
+                    coll[i].click();
+                }
+            }
+        }
+
+        function parseJSON(response) {
+            return response.json();
+        }
+
+
+        async function makeRequest(endpoint, parameters) {
+            var tenant = document.getElementById("tenant").value;
+
+            // sanitize tenant URL
+            tmp = tenant.slice(-1);
+            if (tmp == '/') {
+                tenant = tenant.slice(0, -1);
+            }
+
+            var token = document.getElementById("token").value;
+            var url = new URL(tenant + endpoint)
+
+            // TODO: handle nextPageKey !
+            var params = parameters 
+
+            url.search = new URLSearchParams(params).toString();
+
+            const response = fetch(url, {
+                method: "GET",
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": "Api-Token " + token
+                },
+            })
+                .then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    return data
+                });
+            return response
+        }
+
+        function getExtensions() {
+            endpoint = "/api/config/v1/extensions"
+            makeRequest(endpoint, { pageSize: 100 }).then(response => {
+                updateExtensionDropdown(response)
+            })
+        }
+
+        function updateExtensionDropdown(data) {
+            console.log("Updated drop down")
+            var drop_down = document.getElementById("event_type");
+            for (const element of data.extensions) {
+                //console.log(element);
+                if (element.type != "ONEAGENT") {
+                    continue
+                }
+                var option = document.createElement("option");
+                option.value = element.id;
+                //console.log(option.value);
+                option.text = element.id;
+                drop_down.add(option);
+            }
+        }
+
+        function loadExtensionConfig() {
+            var event_type = document.getElementById("event_type").value;
+            console.log(event_type)
+            endpoint = "/api/config/v1/extensions/" + event_type
+            makeRequest(endpoint, { pageSize: 2 }).then(response => {
+                //console.log(response)
+                const node = document.getElementById("error_container")
+                node.innerHTML = ""
+                for (const i in response.properties) {
+                    console.log(response.properties[i])
+                    //Create an input type dynamically.
+                    //var element = document.createElement("input");
+                    var element = document.createElement("textarea");
+
+                    //Create Labels
+                    var label = document.createElement("Label");
+                    label.innerHTML = response.properties[i].key;
+
+                    //Assign different attributes to the element.
+                    element.setAttribute("type", "text");
+                    //element.setAttribute("value", response.properties[i].defaultValue);
+                    element.innerHTML = response.properties[i].defaultValue
+                    element.setAttribute("wrap", "hard");
+                    element.setAttribute("id", response.properties[i].key);
+                    element.setAttribute("name", "Test Name");
+                    //element.setAttribute("class", "inputfield");
+                    element.setAttribute("style", "width:350px;");
+
+                    //label.setAttribute("style", "font-weight:normal");
+                    label.setAttribute("class", "label");
+                    node.appendChild(label);
+                    node.appendChild(element);
+                }
+
+                var br = document.createElement("br")
+                node.appendChild(br)
+                node.appendChild(br)
+
+                var btn_div = document.createElement("div")
+                btn_div.setAttribute("style", "float: left; width: 90px; margin-left: 0px;");
+
+
+                var btn = document.createElement("button");
+                btn.setAttribute("type", "button");
+                btn.setAttribute("role", "button");
+                btn.setAttribute("class", "btn btn--primary");
+                btn.setAttribute("style", "margin-top: 24px");
+                btn.setAttribute("value", "Upload Config");
+                btn.setAttribute("text", "Upload Config");
+                btn.setAttribute("onClick", "uploadConfig()");
+                btn.innerHTML = "Upload Config"
+                btn_div.appendChild(btn)
+
+                node.appendChild(btn_div)
+            });
+        }
+
+        async function uploadConfig() {
+            console.log('Uploading Config')
+            payload = {
+                "id": document.getElementById("event_type").value,
+                "enabled": true,
+                "useGlobal": false,
+                "hostId": "lorem",
+                "properties": {
+                }
+            }
+            let menu = document.getElementById('error_container');
+            let children = menu.children;
+            var childs = menu.querySelectorAll(':scope > textarea');
+            console
+            for (const i in childs) {
+
+                property = childs[i].id
+                if (property) {
+                    payload.properties[property]= document.getElementById(property).value
+                }
+            }
+            //console.log(childs);
+            console.log(JSON.stringify(payload))
+
+            parameters = {
+                "id": document.getElementById("event_type").value
+            }
+            let promiseB = searchEntities()
+            promiseB.then(function (result) {
+                // here you can use the result of promiseB
+                //console.log(result)
+                for (const i in result.entities) {
+                    //console.log(result.entities[i].entityId)
+                    payload.hostId = result.entities[i].entityId
+                    console.log(payload)
+                    postConfig(payload, parameters)
+                }
+            });
+        }
+
+        function postConfig(payload, parameters) {
+            var tenant = document.getElementById("tenant").value;
+
+            // sanitize tenant URL
+            tmp = tenant.slice(-1);
+            if (tmp == '/') {
+                tenant = tenant.slice(0, -1);
+            }
+
+            var token = document.getElementById("token").value;
+            var url = new URL(tenant + '/api/config/v1/extensions/' + parameters.id + '/instances/' + payload.hostId)
+
+            var params = parameters
+
+            url.search = new URLSearchParams(params).toString();
+
+            const response = fetch(url, {
+                method: "PUT",
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    "Authorization": "Api-Token " + token
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(function (response) {
+                    // already a dict
+                    console.log(response)
+                })
+        }
+        async function searchEntities() {
+            let selector = document.getElementById('text_entity_selector').value;
+            params = {
+                "pageSize": 500,
+                "entitySelector": selector,
+                "from": "-3M",
+                "to": "now"
+            }
+            endpoint = "/api/v2/entities"
+            const res = makeRequest(endpoint, params).then(response => {
+                console.log(response)
+                return response
+            })
+            return res
+        }
+    </script>
+
+
+
+</head>
+
+<body>
+
+    <div class="nav has-no-secondary">
+
+        <a class="nav__brand">
+            <img class="nav__logo" src="images/dynatrace-logo.svg" alt="dynatrace logo" />
+        </a>
+
+        <nav id="nav-bar-example1" class="nav__bar">
+        </nav>
+
+    </div>
+
+    <div id="main" style="margin-left: 50px; margin-top: 25px">
+
+        <div id="controls" style="width: 615px">
+
+            <div id="config_container" style=" width: 1000px; margin-left: 5px">
+
+                <h3 class="collapsible step1" style="width:220px">Step 1 - Config</h3>
+
+
+                <div style="width: 700px" class="content">
+
+                    <div id="tenant_container" style="float:left">
+                        <label for="tenant" class="label required">Tenant URL</label>
+                        <input style="width:350px;" type="text" class="inputfield"
+                            placeholder="https://xxxxxxxx.live.dynatraces.com/" id="tenant" value="" />
+                    </div>
+                    <br /><br /><br />
+                    <div id="token_container" style="float:left">
+                        <label for="token" class="label required">API token</label>
+                        <input style="width:350px;" type="password" class="inputfield"
+                            placeholder="User session access needed" id="token" value="" />
+                    </div>
+                    <br /><br /><br />
+
+                    <div id="fetchAuditLog_container" style="float: left; width: 90px; margin-left: 5px;">
+                        <button id="fetchErrors" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" onclick="getExtensions()">Fetch Extensions</button>
+                    </div>
+                    <br /><br /><br />
+                    <div id="margin_container" style="float:left; margin-left: 5px">
+                        <label for="margin" class="label required">Extension List</label>
+                        <select name="enventType" id="event_type">
+                        </select>
+                    </div>
+                    <br /><br /><br />
+                    <div id="downloadButton_container" style="float: left; width: 90px; margin-left: 5px;">
+                        <button id="filter" style="margin-top: 24px" role="button" type="button"
+                            class="btn btn--primary" onclick="loadExtensionConfig()">Load Extension Config</button>
+                    </div>
+                </div>
+
+                <h3 id="step2_entity_selector" class="collapsible step2" style="width:350px">Step 2 - Entity Selector
+                </h3>
+
+                <div id="entity_selector" style="display: inline-block; width: 700px; margin-left: 5px;"
+                    class="content">
+
+
+                    <div id="filter_container" style="float:left">
+                        <label for="log_id" class="label">Selector</label>
+                        <textarea style="width:450px;height: 100px;" type="text" placeholder="type(&quot;host&quot;)"
+                            id="text_entity_selector" value="">type("host"),tag("env")</textarea>
+                    </div>
+
+
+                    <br /><br />
+                    <br /><br />
+                    <br /><br />
+                    <div id="filterButton_container"
+                        style="position:relative; float: left; width: 90px; margin-left: 5px;">
+                        <button id="filter" style="position:relative;" role="button" type="button"
+                            class="btn btn--primary" onclick="searchEntities()">Search</button>
+                    </div>
+
+                </div>
+
+                <h3 id="step2head" class="collapsible step2" style="width:350px">Step 3 - Configure Extension</h3>
+
+                <div id="error_container" style="display: inline-block; width: 1700px; margin-left: 5px"
+                    class="content">
+
+
+                </div>
+
+
+                <br /><br />
+
+                <script type="text/javascript" src="js/main.js"></script>
+                <script type="text/javascript">
+                    var coll = document.getElementsByClassName("collapsible");
+                    var i;
+
+                    for (i = 0; i < coll.length; i++) {
+                        coll[i].addEventListener("click", function () {
+                            this.classList.toggle("active");
+                            var content = this.nextElementSibling;
+                            if (content.style.maxHeight) {
+                                content.style.maxHeight = null;
+                            } else {
+                                content.style.maxHeight = content.scrollHeight + "px";
+                            }
+                        });
+                    }
+
+                    document.getElementsByClassName("collapsible")[0].click();
+                </script>
+</body>
+
+</html>
