@@ -77,99 +77,212 @@ Tg)}}})()})();
 </script>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="utf-8" http-equiv="encoding">
-    <title>Audit Log analyser</title>
+    <title>Audit Log Analyser</title>
     <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
     <link rel="stylesheet" href="css/main.css" />
+    <script src="js/main.js"></script>
     <style>
-        .collapsible {
-            background-color: white;
-            color: black;
-            cursor: pointer;
-            padding: 18px;
+        .page-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #454646;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6f7071;
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group .label {
+            margin-bottom: 4px;
+        }
+
+        .form-group .inputfield,
+        .form-group select {
             width: 100%;
+        }
+
+        .form-group--wide {
+            flex: 1 1 300px;
+        }
+
+        .form-group--medium {
+            flex: 0 1 180px;
+        }
+
+        .form-group select {
+            font-family: "BerninaSans", "Open Sans", sans-serif;
+            font-size: 14px;
+            height: 34px;
+            padding: 0 8px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            background: #fff;
+            color: #454646;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .separator {
             border: none;
-            text-align: left;
-            outline: none;
+            border-top: 1px solid #eee;
+            margin: 16px 0;
         }
 
-        .active,
-        .collapsible:hover {
-            background-color: white;
+        .results-container {
+            max-width: 95vw;
+            margin: 0 auto;
+            padding: 0 24px 32px;
         }
 
-        .content {
-            padding: 0 18px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
-            background-color: white;
+        .column-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .column-picker-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #6f7071;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-right: 4px;
+        }
+
+        .column-toggle {
+            display: none;
+        }
+
+        .column-toggle + label {
+            display: inline-block;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            color: #6f7071;
+            cursor: pointer;
+            user-select: none;
+            transition: all 100ms ease-out;
+        }
+
+        .column-toggle:checked + label {
+            background: #00a1b2;
+            border-color: #00a1b2;
+            color: #fff;
+        }
+
+        .column-toggle + label:hover {
+            border-color: #00a1b2;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        #table {
             width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
         }
 
-        .collapsible:after {
-            content: url("images/dropdownclosed.png");
-            transform: scale(.05);
-            widows: 20px;
-            height: 20px;
-            font-size: 13px;
-            color: white;
-            float: left;
-            margin-left: -65px;
-            margin-top: -35px;
+        #table th {
+            background: #f4f4f4;
+            text-align: left;
+            padding: 8px 12px;
+            font-weight: 600;
+            color: #454646;
+            border-bottom: 2px solid #ddd;
+            white-space: nowrap;
         }
 
-        .step2:after {
-            content: url("images/dropdownclosed.png");
-            transform: scale(.05);
-            widows: 20px;
-            height: 20px;
-            font-size: 13px;
-            color: white;
-            float: left;
-            margin-left: 60px;
-            margin-top: -35px;
+        #table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            color: #454646;
+            word-break: break-word;
+            max-width: 350px;
         }
 
-        .active:after {
-            content: url("images/dropdownopen.png");
-            transform: scale(.05);
+        #table tr:hover td {
+            background: #f9f9f9;
+        }
+
+        #showRule {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        #showRule pre {
+            background: #f7f7f7;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 16px;
+            overflow: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
         }
 
         .required:before {
             content: "*";
-            color: red
+            color: red;
         }
     </style>
     <script type="text/javascript">
 
-        var window = {};
-        window.ADD_TRADES = "test";
-        function hideAll() {
-
-            var coll = document.getElementsByClassName("collapsible");
-            var i;
-
-            for (i = 0; i < coll.length; i++) {
-                if (coll[i].classList.contains("active")) {
-                    coll[i].click();
-                }
-            }
-        }
-
-        function parseJSON(response) {
-            return response.json();
-        }
+        var allColumns = [];
+        var allData = [];
+        var defaultColumns = ['logId', 'eventType', 'user', 'entityId'];
 
         function fetchAuditLog() {
-            var single_log = document.getElementById("showRule");
-            single_log.style.display = "none";
-            var table = document.getElementById("table");
-            table.style.display = "";
+            document.getElementById("showRule").style.display = "none";
+            document.getElementById("results-section").style.display = "";
 
             var tenant = document.getElementById("tenant").value;
-
-            // sanitize tenant URL
-            tmp = tenant.slice(-1);
+            var tmp = tenant.slice(-1);
             if (tmp == '/') {
                 tenant = tenant.slice(0, -1);
             }
@@ -181,7 +294,7 @@ Tg)}}})()})();
             }
             var event_type = document.getElementById("event_type").value;
 
-            const response = fetch(tenant + '/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
+            fetch(tenant + '/api/v2/auditlogs?filter=eventType%28' + event_type + '%29&from=' + time_frame, {
                 method: "GET",
                 mode: 'cors',
                 headers: {
@@ -192,107 +305,111 @@ Tg)}}})()})();
                 .then(function (response) {
                     return response.json();
                 }).then(function (data) {
-                    displayLog(data)
+                    displayLog(data);
                 });
-
-
         }
 
-        // filters out all the different columns
         function displayLog(data) {
-            var selector = document.getElementById("table");
-            selector.innerHTML = "";
-            // columns has the header of the table
-            var columns = [];
-            //var header = $('<tr/>'); 
-            var list = data.auditLogs
+            allColumns = [];
+            allData = data.auditLogs;
 
-            for (var i = 0; i < list.length; i++) {
-                var row = list[i];
-
-                for (var k in row) {
-                    if (!columns.includes(k)) {
-                        columns.push(k);
+            for (var i = 0; i < allData.length; i++) {
+                for (var k in allData[i]) {
+                    if (allColumns.indexOf(k) === -1) {
+                        allColumns.push(k);
                     }
                 }
             }
-            //console.log(columns)
-            generateTableHead(selector, columns)
-            generateTable(selector, list)
-            return columns;
+
+            buildColumnPicker();
+            renderTable();
         }
 
-        function generateTableHead(table, data) {
-            let thead = table.createTHead();
-            let row = thead.insertRow();
-            for (let key of data) {
-                let th = document.createElement("th");
-                let text = document.createTextNode(key);
-                th.appendChild(text);
-                row.appendChild(th);
+        function buildColumnPicker() {
+            var picker = document.getElementById("column-picker");
+            // keep the label, clear the rest
+            picker.innerHTML = '<span class="column-picker-label">Columns:</span>';
+
+            for (var i = 0; i < allColumns.length; i++) {
+                var col = allColumns[i];
+                var checked = defaultColumns.indexOf(col) !== -1 ? ' checked' : '';
+                picker.innerHTML +=
+                    '<input type="checkbox" class="column-toggle" id="col_' + col + '"' + checked +
+                    ' onchange="renderTable()">' +
+                    '<label for="col_' + col + '">' + col + '</label>';
             }
         }
 
-        function generateTable(table, data) {
-            for (let element of data) {
-                let row = table.insertRow();
-                for (key in element) {
-                    let cell = row.insertCell();
-                    if (key == 'timestamp') {
-                        //console.log(timeConverter(element[key]));
-                        timestamp = timeConverter(element[key]);
-                        let text = document.createTextNode(timestamp);
-                        cell.appendChild(text);
-                    }
-                    else {
-                        let text = document.createTextNode(element[key]);
-                        cell.appendChild(text);
-                    }
+        function getVisibleColumns() {
+            var visible = [];
+            for (var i = 0; i < allColumns.length; i++) {
+                var cb = document.getElementById('col_' + allColumns[i]);
+                if (cb && cb.checked) {
+                    visible.push(allColumns[i]);
                 }
             }
+            return visible;
         }
 
-
-
-        function filter() {
-            var single_log = document.getElementById("showRule");
-            single_log.style.display = "none";
+        function renderTable() {
             var table = document.getElementById("table");
-            table.style.display = "";
-            var filter_value = document.getElementById("filter_value").value;
+            table.innerHTML = "";
+
+            var visible = getVisibleColumns();
+            if (visible.length === 0 || allData.length === 0) return;
+
+            // header
+            var thead = table.createTHead();
+            var hrow = thead.insertRow();
+            for (var i = 0; i < visible.length; i++) {
+                var th = document.createElement("th");
+                th.appendChild(document.createTextNode(visible[i]));
+                hrow.appendChild(th);
+            }
+
+            // body
+            var tbody = document.createElement("tbody");
+            table.appendChild(tbody);
+            for (var r = 0; r < allData.length; r++) {
+                var row = tbody.insertRow();
+                for (var c = 0; c < visible.length; c++) {
+                    var cell = row.insertCell();
+                    var key = visible[c];
+                    var val = allData[r][key];
+                    if (val === undefined) val = '';
+                    if (key === 'timestamp') {
+                        val = timeConverter(val);
+                    }
+                    cell.appendChild(document.createTextNode(val));
+                }
+            }
+        }
+
+        function filterTable() {
+            document.getElementById("showRule").style.display = "none";
+            document.getElementById("results-section").style.display = "";
+            var filter_value = document.getElementById("filter_value").value.toLowerCase();
             var table = document.getElementById("table");
             for (var i = 1, row; row = table.rows[i]; i++) {
-                //iterate through rows
-                //rows would be accessed using the "row" variable assigned in the for loop
-                for (var j = 0, col; col = row.cells[j]; j++) {
-                    //iterate through columns
-                    //columns would be accessed using the "col" variable assigned in the for loop
-                    var text_content = row.textContent.toLowerCase();
-                    var search_val = filter_value.toLowerCase();
-                    row.style.display = text_content.indexOf(search_val) > -1 ? '' : 'none';
-                }
+                var text_content = row.textContent.toLowerCase();
+                row.style.display = text_content.indexOf(filter_value) > -1 ? '' : 'none';
             }
         }
 
         function analyseErrors() {
-            var table = document.getElementById("table");
-            table.style.display = "none";
+            document.getElementById("results-section").style.display = "none";
             var single_log = document.getElementById("showRule");
             single_log.style.display = "";
 
             var tenant = document.getElementById("tenant").value;
-            // sanitize tenant URL
-            tmp = tenant.slice(-1);
+            var tmp = tenant.slice(-1);
             if (tmp == '/') {
                 tenant = tenant.slice(0, -1);
             }
             var token = document.getElementById("token").value;
-            var log_id = document.getElementById("log_id").value
-            //var single_error = document.getElementById("errorList").value;
-            //var original_single_error = single_error;
-            //single_error = single_error.replace(/"/g, '\"\"');
+            var log_id = document.getElementById("log_id").value;
 
-            const response = fetch( tenant + '/api/v2/auditlogs/' + log_id, {
+            fetch(tenant + '/api/v2/auditlogs/' + log_id, {
                 method: "GET",
                 mode: 'cors',
                 headers: {
@@ -303,181 +420,122 @@ Tg)}}})()})();
                 .then(function (response) {
                     return response.json();
                 }).then(function (data) {
-                    //console.log(data);
-                    var str = JSON.stringify(data, null, 2); // spacing level = 2
-                    var nice = syntaxHighlight(str)
-                    //document.body.appendChild(document.createElement('pre')).innerHTML = nice;
-                    document.getElementById("showRule").innerHTML = "";
-                    document.getElementById("showRule").appendChild(document.createElement('pre')).innerHTML = nice;
-                    //document.getElementById("showRule").innerHTML = nice;
-                    //displayLog(data)
+                    var str = JSON.stringify(data, null, 2);
+                    var nice = syntaxHighlight(str);
+                    single_log.innerHTML = "";
+                    single_log.appendChild(document.createElement('pre')).innerHTML = nice;
                 });
-
         }
 
     </script>
-
-
 
 </head>
 
 <body>
 
     <div class="nav has-no-secondary">
-
-        <a class="nav__brand">
+        <a class="nav__brand" href="home.html">
             <img class="nav__logo" src="images/dynatrace-logo.svg" alt="dynatrace logo" />
         </a>
+    </div>
 
-        <nav id="nav-bar-example1" class="nav__bar">
-        </nav>
+    <div class="page-container">
+
+        <h1 class="page-title">Audit Log Analyser</h1>
+
+        <!-- Connection -->
+        <div class="card">
+            <div class="card-title">Connection</div>
+            <div class="form-row">
+                <div class="form-group form-group--wide">
+                    <label for="tenant" class="label required">Tenant URL</label>
+                    <input type="text" class="inputfield" placeholder="https://xxxxxxxx.live.dynatrace.com/" id="tenant" value="" />
+                </div>
+                <div class="form-group form-group--wide">
+                    <label for="token" class="label required">API Token</label>
+                    <input type="password" class="inputfield" placeholder="Audit log read access needed" id="token" value="" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Query -->
+        <div class="card">
+            <div class="card-title">Query</div>
+            <div class="form-row">
+                <div class="form-group form-group--medium">
+                    <label for="time_frame" class="label">Time Frame</label>
+                    <input type="text" class="inputfield" placeholder="now-2d" id="time_frame" value="" />
+                </div>
+                <div class="form-group form-group--medium">
+                    <label for="event_type" class="label">Event Type</label>
+                    <select name="eventType" id="event_type">
+                        <option value="create">CREATE</option>
+                        <option value="delete">DELETE</option>
+                        <option value="general">GENERAL</option>
+                        <option value="login">LOGIN</option>
+                        <option value="logout">LOGOUT</option>
+                        <option value="read">READ</option>
+                        <option value="update">UPDATE</option>
+                        <option value="get">GET</option>
+                        <option value="patch">PATCH</option>
+                        <option value="post">POST</option>
+                        <option value="put">PUT</option>
+                        <option value="remote_configuration_management">REMOTE_CONFIGURATION_MANAGEMENT</option>
+                        <option value="revoke">REVOKE</option>
+                        <option value="tag_add">TAG_ADD</option>
+                        <option value="tag_remove">TAG_REMOVE</option>
+                        <option value="tag_update">TAG_UPDATE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn--primary" onclick="fetchAuditLog()">Fetch Logs</button>
+                </div>
+            </div>
+
+            <hr class="separator" />
+
+            <div class="form-row">
+                <div class="form-group form-group--medium">
+                    <label for="filter_value" class="label">Filter Results</label>
+                    <input type="text" class="inputfield" placeholder="e.g. user-name" id="filter_value" value="" />
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn--primary" onclick="filterTable()">Search</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn" onclick="exportTableToCSV('audit-log.csv')">Download CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Detail -->
+        <div class="card">
+            <div class="card-title">Log Detail</div>
+            <div class="form-row">
+                <div class="form-group form-group--medium">
+                    <label for="log_id" class="label">Log ID</label>
+                    <input type="text" class="inputfield" placeholder="Enter log ID" id="log_id" value="" />
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn--primary" onclick="analyseErrors()">Fetch Detail</button>
+                </div>
+            </div>
+        </div>
 
     </div>
 
-    <div id="main" style="margin-left: 50px; margin-top: 25px">
-
-        <div id="controls" style="width: 615px">
-
-            <div id="config_container" style=" width: 1000px; margin-left: 5px">
-
-                <h3 class="collapsible step1" style="width:220px">Step 1 - Config</h3>
-
-
-                <div style="width: 700px" class="content">
-
-                    <div id="tenant_container" style="float:left">
-                        <label for="tenant" class="label required">Tenant URL</label>
-                        <input style="width:350px;" type="text" class="inputfield"
-                            placeholder="https://xxxxxxxx.live.dynatraces.com/" id="tenant" value="" />
-                    </div>
-                    <br /><br /><br />
-                    <div id="token_container" style="float:left">
-                        <label for="token" class="label required">API token</label>
-                        <input style="width:350px;" type="password" class="inputfield"
-                            placeholder="User session access needed" id="token" value="" />
-                    </div>
-                    <!--
-                    <div id="property_container" style="float:left; margin-left: 5px">
-                        <label for="tag" class="label required">Error property</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="Must be a string"
-                            id="error" value="" />
-                    </div>
-                    -->
-
-                    <br /><br /><br />
-
-                    <div id="tenant_container" style="float:left">
-                        <label for="tenant" class="label required">Time Frame</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="now-2d" id="time_frame"
-                            value="" />
-                    </div>
-                    <br /><br /><br />
-
-                    <div id="margin_container" style="float:left; margin-left: 5px">
-                        <label for="margin" class="label required">Event Type</label>
-                        <select name="enventType" id="event_type">
-                            <option value="create">CREATE</option>
-                            <option value="delete">DELETE</option>
-                            <option value="general">GENERAL</option>
-                            <option value="login">LOGIN</option>
-                            <option value="logout">LOGOUT</option>
-                            <option value="read">READ</option>
-                            <option value="update">UPDATE</option>
-                            <option value="get">GET</option>
-                            <option value="patch">PATCH</option>
-                            <option value="post">POST</option>
-                            <option value="put">PUT</option>
-                            <option value="read">READ</option>
-                            <option value="remote_configuration_management">REMOTE_CONFIGURATION_MANAGEMENT</option>
-                            <option value="revoke">REVOKE</option>
-                            <option value="tag_add">TAG_ADD</option>
-                            <option value="tag_remove">TAG_REMOVE</option>
-                            <option value="tag_update">TAG_UPDATE</option>
-                        </select>
-                        <!--
-                        <input style="width:100px;" type="text" class="inputfield" placeholder="% percent" id="margin"
-                            value="" />
-                        -->
-                    </div>
-                    <br /><br />
-                    <!--
-                    <div id="conversion_container" style="float:left; margin-left: 5px;">
-                        <label for="conversion" class="label required">Conversion action</label>
-                        <input style="width:300px;" type="text" class="inputfield"
-                            placeholder="Exact name of the action" id="conversion" value="" />
-                    </div>
-                    -->
-                    <div id="fetchAuditLog_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="fetchErrors" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="fetchAuditLog()">Fetch Logs</button>
-                    </div>
-
-                    <br /><br /><br />
-                    <div id="filter_container" style="float:left">
-                        <label for="tenant" class="label">Filter</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name"
-                            id="filter_value" value="" />
-                    </div>
-
-                    <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="filter" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="filter()">Search</button>
-                    </div>
-
-                    <br /><br /><br />
-                    <div id="downloadButton_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="filter" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="exportTableToCSV('test.csv')">Download Log</button>
-                    </div>
-                </div>
-
-                <h3 id="step2head" class="collapsible step2" style="width:350px">Step 2 - Select Log</h3>
-
-                <div id="error_container"
-                    style="display: inline-block; width: 700px; margin-left: 5px" class="content">
-
-
-                    <div id="filter_container" style="float:left">
-                        <label for="log_id" class="label">Log ID</label>
-                        <input style="width:150px;" type="text" class="inputfield" placeholder="e.g. user-name"
-                            id="log_id" value="" />
-                    </div>
-
-                    <div id="filterButton_container" style="float: left; width: 90px; margin-left: 5px;">
-                        <button id="filter" style="margin-top: 24px" role="button" type="button"
-                            class="btn btn--primary" onclick="analyseErrors()">Search</button>
-                    </div>
-
-                </div>
-
-
-                <br /><br />
-
-        <div id="showRule" class="text" style="width: 800px">
-
+    <!-- Results - independent full-width section -->
+    <div id="results-section" class="results-container" style="display: none;">
+        <div id="column-picker" class="column-picker">
+            <span class="column-picker-label">Columns:</span>
         </div>
-            </div>
-            <table id="table" class="table data-table table-striped customers-list">
-            </table>
-            <script type="text/javascript" src="js/main.js"></script>
-            <script type="text/javascript">
-                var coll = document.getElementsByClassName("collapsible");
-                var i;
+        <div class="table-wrap">
+            <table id="table"></table>
+        </div>
+    </div>
 
-                for (i = 0; i < coll.length; i++) {
-                    coll[i].addEventListener("click", function () {
-                        this.classList.toggle("active");
-                        var content = this.nextElementSibling;
-                        if (content.style.maxHeight) {
-                            content.style.maxHeight = null;
-                        } else {
-                            content.style.maxHeight = content.scrollHeight + "px";
-                        }
-                    });
-                }
+    <div id="showRule" style="display: none;"></div>
 
-                document.getElementsByClassName("collapsible")[0].click();
-            </script>
 </body>
 
 </html>

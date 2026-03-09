@@ -1,0 +1,114 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333; /* Dark gray background */
+    color: white;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.hamburger {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.nav-menu {
+    display: none; /* Hidden by default */
+    background-color: #444; /* Slightly lighter gray */
+}
+
+.nav-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-menu ul li {
+    padding: 10px 20px;
+}
+
+.nav-menu ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-menu ul li:hover {
+    background-color: #555; /* Darker gray on hover */
+}
+
+@media (min-width: 600px) {
+    .nav-menu {
+        display: block; /* Show menu on larger screens */
+    }
+}
+
+
+.tile {
+    padding: 41px 36px;
+    min-height: 188px;
+    /*max-width: 295px;*/
+    margin-bottom: 30px;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 1 295px;
+    flex: 0 1 295px;
+    background-color: #fff;
+    background-repeat: no-repeat, no-repeat;
+    background-position: center 100%, center 100%;
+    background-size: 100%, 100%;
+    -webkit-box-shadow: 0 19px 26px rgba(0, 0, 0, .15);
+    box-shadow: 0 19px 26px rgba(0, 0, 0, .15);
+    border-radius: 5px;
+}
+
+.glass-button {
+    background: transparent;
+    border: 0.0625rem solid #314287;
+    border-radius: 0.25rem;
+    color: #314287;
+    padding: 0.3rem;
+    /*letter-spacing: 0.1rem;*/
+    font-weight: normal;
+    font-size: 0.875rem;
+}
+
+.glass-button:hover {
+    /*background: transparent;*/
+    border: 0.0625rem solid #314287;
+    border-radius: 0.25rem;
+    color: #314287;
+    padding: 0.3rem;
+    /*letter-spacing: 0.1rem;*/
+    background-color: #ebf5fe;
+    font-weight: normal;
+    font-size: 0.875rem;
+}
+
+.glass-button:visited {
+    background: transparent;
+    border: 0.0625rem solid #314287;
+    border-radius: 0.25rem;
+    color: #314287;
+    padding: 0.3rem;
+    /*letter-spacing: 0.1rem;*/
+    font-weight: normal;
+    font-size: 0.875rem;
+}
+
+.step-title {
+    font-weight: bold;
+    color: #314287;
+    font-size: 1.15rem;
+}
+
+.task-title {
+    color: #314287;
+}
