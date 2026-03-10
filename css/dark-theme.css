@@ -1,33 +1,41 @@
 /*
  * Dynatrace Platform Dark Mode Theme
- * Mirrors the look and feel of the Dynatrace Grail platform UI
+ * Based on official design tokens from developer.dynatrace.com/design/design-tokens/Colors
+ *
+ * Primary palette (dark):
+ *   10: #212138  20: #292944  30: #313150  40: #39395d
+ *   50: #42426a  60: #4a4b78  70: #999bed  80: #a8abfe  90: #b8bbff
+ *
+ * Background:  base #19192c   surface #212138
+ * Text:        default #ebecff  primary #adb0ff
+ * Accent:      container #999bed  border #adb0ff
  */
 
 /* ── Base ── */
 body {
-    background-color: #0b0c0e;
-    color: #e0e0e6;
+    background-color: #19192c;
+    color: #ebecff;
 }
 
 a {
-    color: #6bc1ff;
+    color: #a8abfe;
 }
 
 a:hover {
-    color: #99d5ff;
+    color: #b8bbff;
 }
 
 /* ── Nav bar override ── */
 .nav,
 .nav.has-no-secondary {
-    background-color: #11131a !important;
-    border-bottom: 1px solid #1e2130;
+    background-color: #121222 !important;
+    border-bottom: 1px solid #313150;
 }
 
 @media (min-width: 980px) {
     .nav,
     .nav.has-no-secondary {
-        background-color: #11131a !important;
+        background-color: #121222 !important;
     }
 }
 
@@ -41,16 +49,16 @@ a:hover {
 .page-title {
     font-size: 1.5rem;
     font-weight: 300;
-    color: #e0e0e6;
+    color: #ebecff;
     margin-bottom: 24px;
 }
 
 /* ── Cards ── */
 .card {
-    background: #16171e;
-    border: 1px solid #1e2130;
+    background: #212138;
+    border: 1px solid #313150;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     padding: 24px;
     margin-bottom: 20px;
 }
@@ -60,7 +68,7 @@ a:hover {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #8b8fa8;
+    color: #999bed;
     margin-bottom: 16px;
 }
 
@@ -96,7 +104,7 @@ a:hover {
 
 /* ── Labels ── */
 .label {
-    color: #8b8fa8;
+    color: #999bed;
     font-size: 12px;
     margin-bottom: 4px;
 }
@@ -114,9 +122,9 @@ textarea,
 select {
     font-family: "BerninaSans", "Open Sans", sans-serif;
     font-size: 14px;
-    background: #0b0c0e;
-    color: #e0e0e6;
-    border: 1px solid #2a2d3e;
+    background: #19192c;
+    color: #ebecff;
+    border: 1px solid #42426a;
     border-radius: 4px;
     padding: 7px 10px;
     transition: border-color 120ms ease-out;
@@ -127,14 +135,14 @@ select {
 .form-group textarea:focus,
 textarea:focus,
 select:focus {
-    border-color: #1496ff;
+    border-color: #a8abfe;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(20, 150, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(168, 171, 254, 0.2);
 }
 
 .inputfield::placeholder,
 textarea::placeholder {
-    color: #4a4d5e;
+    color: #4a4b78;
 }
 
 .form-group select,
@@ -151,50 +159,63 @@ textarea {
 /* ── Buttons ── */
 .btn {
     font-family: "BerninaSans", "Open Sans", sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     background: transparent;
-    color: #6bc1ff;
-    border: 1px solid #2a2d3e;
+    color: #a8abfe;
+    border: 1px solid #42426a;
     border-radius: 4px;
     padding: 7px 16px;
     cursor: pointer;
     font-size: 14px;
+    line-height: 1.4;
+    white-space: nowrap;
     transition: all 120ms ease-out;
+    box-sizing: border-box;
 }
 
 .btn:hover {
-    border-color: #1496ff;
-    color: #99d5ff;
+    border-color: #a8abfe;
+    color: #b8bbff;
     text-decoration: none;
 }
 
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(168, 171, 254, 0.25);
+}
+
 .btn--primary {
-    background: #1496ff;
-    border-color: #1496ff;
+    background: #474fcf;
+    border-color: #474fcf;
     color: #fff;
 }
 
-.btn--primary:hover {
-    background: #3eaaff;
-    border-color: #3eaaff;
+.btn--primary:hover,
+.btn--primary:visited {
+    background: #5a62e0;
+    border-color: #5a62e0;
     color: #fff;
 }
 
 .btn--primary:active {
-    background: #0d7fdf;
-    border-color: #0d7fdf;
+    background: #3b3fbe;
+    border-color: #3b3fbe;
 }
 
 /* ── Separator ── */
 .separator {
     border: none;
-    border-top: 1px solid #1e2130;
+    border-top: 1px solid #313150;
     margin: 16px 0;
 }
 
 /* ── Hint text ── */
 .hint {
     font-size: 0.8rem;
-    color: #5a5e74;
+    color: #4a4b78;
     margin-top: 4px;
 }
 
@@ -208,12 +229,12 @@ textarea {
 .landing h1 {
     font-size: 1.8rem;
     font-weight: 300;
-    color: #e0e0e6;
+    color: #ebecff;
     margin-bottom: 0.4rem;
 }
 
 .landing p.subtitle {
-    color: #8b8fa8;
+    color: #999bed;
     font-size: 1rem;
     margin-bottom: 48px;
 }
@@ -225,8 +246,8 @@ textarea {
 }
 
 .tool-card {
-    background: #16171e;
-    border: 1px solid #1e2130;
+    background: #212138;
+    border: 1px solid #313150;
     border-radius: 8px;
     padding: 32px 28px;
     transition: border-color 150ms ease-out, transform 150ms ease-out, box-shadow 150ms ease-out;
@@ -236,8 +257,8 @@ textarea {
 }
 
 .tool-card:hover {
-    border-color: #1496ff;
-    box-shadow: 0 4px 20px rgba(20, 150, 255, 0.1);
+    border-color: #a8abfe;
+    box-shadow: 0 4px 20px rgba(71, 79, 207, 0.15);
     transform: translateY(-2px);
     text-decoration: none;
     color: inherit;
@@ -247,12 +268,12 @@ textarea {
     font-size: 1.15rem;
     font-weight: 600;
     margin-bottom: 8px;
-    color: #1496ff;
+    color: #a8abfe;
 }
 
 .tool-card p {
     font-size: 0.9rem;
-    color: #8b8fa8;
+    color: #999bed;
     margin: 0;
     line-height: 1.5;
 }
@@ -275,7 +296,7 @@ textarea {
 .column-picker-label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #8b8fa8;
+    color: #999bed;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin-right: 4px;
@@ -286,26 +307,28 @@ textarea {
 }
 
 .column-toggle + label {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 0.8rem;
     padding: 4px 10px;
     border-radius: 4px;
-    border: 1px solid #2a2d3e;
-    color: #8b8fa8;
+    border: 1px solid #42426a;
+    color: #999bed;
     cursor: pointer;
     user-select: none;
     transition: all 100ms ease-out;
 }
 
 .column-toggle:checked + label {
-    background: #1496ff;
-    border-color: #1496ff;
+    background: #474fcf;
+    border-color: #474fcf;
     color: #fff;
 }
 
 .column-toggle + label:hover {
-    border-color: #1496ff;
-    color: #6bc1ff;
+    border-color: #a8abfe;
+    color: #a8abfe;
 }
 
 .table-wrap {
@@ -319,25 +342,25 @@ textarea {
 }
 
 #table th {
-    background: #16171e;
+    background: #212138;
     text-align: left;
     padding: 10px 12px;
     font-weight: 600;
-    color: #8b8fa8;
-    border-bottom: 2px solid #1e2130;
+    color: #999bed;
+    border-bottom: 2px solid #313150;
     white-space: nowrap;
 }
 
 #table td {
     padding: 10px 12px;
-    border-bottom: 1px solid #1e2130;
-    color: #c8c9d4;
+    border-bottom: 1px solid #292944;
+    color: #ebecff;
     word-break: break-word;
     max-width: 350px;
 }
 
 #table tr:hover td {
-    background: #1a1b24;
+    background: #292944;
 }
 
 /* ── JSON detail view ── */
@@ -348,18 +371,18 @@ textarea {
 }
 
 #showRule pre {
-    background: #11131a;
-    border: 1px solid #1e2130;
+    background: #212138;
+    border: 1px solid #313150;
     border-radius: 6px;
     padding: 16px;
     overflow: auto;
     font-size: 0.82rem;
     line-height: 1.5;
-    color: #c8c9d4;
+    color: #ebecff;
 }
 
-/* JSON syntax highlighting for dark mode */
-pre .key { color: #6bc1ff; }
+/* JSON syntax highlighting */
+pre .key { color: #a8abfe; }
 pre .string { color: #73dca2; }
 pre .number { color: #d4a0ff; }
 pre .boolean { color: #f5a623; }
@@ -370,10 +393,10 @@ pre .null { color: #f55b5b; }
     font-family: "BerninaSans", "Open Sans", sans-serif;
     font-size: 14px;
     padding: 4px 8px;
-    border: 1px solid #2a2d3e;
+    border: 1px solid #42426a;
     border-radius: 4px;
-    background: #0b0c0e;
-    color: #e0e0e6;
+    background: #19192c;
+    color: #ebecff;
     width: 100%;
     min-height: 300px;
 }
@@ -383,25 +406,25 @@ pre .null { color: #f55b5b; }
 }
 
 .dashboard-select option:checked {
-    background: #1e2846;
-    color: #6bc1ff;
+    background: #39395d;
+    color: #a8abfe;
 }
 
 /* ── Extension config fields ── */
 #extension-config-fields .label {
     margin-top: 12px;
     margin-bottom: 4px;
-    color: #8b8fa8;
+    color: #999bed;
 }
 
 #extension-config-fields textarea {
     font-family: "BerninaSans", "Open Sans", sans-serif;
     font-size: 14px;
     padding: 8px;
-    border: 1px solid #2a2d3e;
+    border: 1px solid #42426a;
     border-radius: 4px;
-    background: #0b0c0e;
-    color: #e0e0e6;
+    background: #19192c;
+    color: #ebecff;
     resize: vertical;
     width: 100%;
     min-height: 60px;
