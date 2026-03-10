@@ -1,0 +1,408 @@
+/*
+ * Dynatrace Platform Dark Mode Theme
+ * Mirrors the look and feel of the Dynatrace Grail platform UI
+ */
+
+/* ── Base ── */
+body {
+    background-color: #0b0c0e;
+    color: #e0e0e6;
+}
+
+a {
+    color: #6bc1ff;
+}
+
+a:hover {
+    color: #99d5ff;
+}
+
+/* ── Nav bar override ── */
+.nav,
+.nav.has-no-secondary {
+    background-color: #11131a !important;
+    border-bottom: 1px solid #1e2130;
+}
+
+@media (min-width: 980px) {
+    .nav,
+    .nav.has-no-secondary {
+        background-color: #11131a !important;
+    }
+}
+
+/* ── Page layout ── */
+.page-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #e0e0e6;
+    margin-bottom: 24px;
+}
+
+/* ── Cards ── */
+.card {
+    background: #16171e;
+    border: 1px solid #1e2130;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8b8fa8;
+    margin-bottom: 16px;
+}
+
+/* ── Form layout ── */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group--wide {
+    flex: 1 1 300px;
+}
+
+.form-group--medium {
+    flex: 0 1 180px;
+}
+
+.form-group--full {
+    flex: 1 1 100%;
+}
+
+/* ── Labels ── */
+.label {
+    color: #8b8fa8;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.required:before {
+    content: "*";
+    color: #f55b5b;
+}
+
+/* ── Inputs ── */
+.inputfield,
+.form-group select,
+.form-group textarea,
+textarea,
+select {
+    font-family: "BerninaSans", "Open Sans", sans-serif;
+    font-size: 14px;
+    background: #0b0c0e;
+    color: #e0e0e6;
+    border: 1px solid #2a2d3e;
+    border-radius: 4px;
+    padding: 7px 10px;
+    transition: border-color 120ms ease-out;
+}
+
+.inputfield:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+textarea:focus,
+select:focus {
+    border-color: #1496ff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(20, 150, 255, 0.15);
+}
+
+.inputfield::placeholder,
+textarea::placeholder {
+    color: #4a4d5e;
+}
+
+.form-group select,
+select {
+    height: 34px;
+}
+
+.form-group textarea,
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ── Buttons ── */
+.btn {
+    font-family: "BerninaSans", "Open Sans", sans-serif;
+    background: transparent;
+    color: #6bc1ff;
+    border: 1px solid #2a2d3e;
+    border-radius: 4px;
+    padding: 7px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 120ms ease-out;
+}
+
+.btn:hover {
+    border-color: #1496ff;
+    color: #99d5ff;
+    text-decoration: none;
+}
+
+.btn--primary {
+    background: #1496ff;
+    border-color: #1496ff;
+    color: #fff;
+}
+
+.btn--primary:hover {
+    background: #3eaaff;
+    border-color: #3eaaff;
+    color: #fff;
+}
+
+.btn--primary:active {
+    background: #0d7fdf;
+    border-color: #0d7fdf;
+}
+
+/* ── Separator ── */
+.separator {
+    border: none;
+    border-top: 1px solid #1e2130;
+    margin: 16px 0;
+}
+
+/* ── Hint text ── */
+.hint {
+    font-size: 0.8rem;
+    color: #5a5e74;
+    margin-top: 4px;
+}
+
+/* ── Landing page ── */
+.landing {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 24px;
+}
+
+.landing h1 {
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: #e0e0e6;
+    margin-bottom: 0.4rem;
+}
+
+.landing p.subtitle {
+    color: #8b8fa8;
+    font-size: 1rem;
+    margin-bottom: 48px;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.tool-card {
+    background: #16171e;
+    border: 1px solid #1e2130;
+    border-radius: 8px;
+    padding: 32px 28px;
+    transition: border-color 150ms ease-out, transform 150ms ease-out, box-shadow 150ms ease-out;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.tool-card:hover {
+    border-color: #1496ff;
+    box-shadow: 0 4px 20px rgba(20, 150, 255, 0.1);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
+}
+
+.tool-card h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1496ff;
+}
+
+.tool-card p {
+    font-size: 0.9rem;
+    color: #8b8fa8;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ── Results table ── */
+.results-container {
+    max-width: 95vw;
+    margin: 0 auto;
+    padding: 0 24px 32px;
+}
+
+.column-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+
+.column-picker-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #8b8fa8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 4px;
+}
+
+.column-toggle {
+    display: none;
+}
+
+.column-toggle + label {
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #2a2d3e;
+    color: #8b8fa8;
+    cursor: pointer;
+    user-select: none;
+    transition: all 100ms ease-out;
+}
+
+.column-toggle:checked + label {
+    background: #1496ff;
+    border-color: #1496ff;
+    color: #fff;
+}
+
+.column-toggle + label:hover {
+    border-color: #1496ff;
+    color: #6bc1ff;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+#table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+#table th {
+    background: #16171e;
+    text-align: left;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: #8b8fa8;
+    border-bottom: 2px solid #1e2130;
+    white-space: nowrap;
+}
+
+#table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1e2130;
+    color: #c8c9d4;
+    word-break: break-word;
+    max-width: 350px;
+}
+
+#table tr:hover td {
+    background: #1a1b24;
+}
+
+/* ── JSON detail view ── */
+#showRule {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+#showRule pre {
+    background: #11131a;
+    border: 1px solid #1e2130;
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #c8c9d4;
+}
+
+/* JSON syntax highlighting for dark mode */
+pre .key { color: #6bc1ff; }
+pre .string { color: #73dca2; }
+pre .number { color: #d4a0ff; }
+pre .boolean { color: #f5a623; }
+pre .null { color: #f55b5b; }
+
+/* ── Dashboard select ── */
+.dashboard-select {
+    font-family: "BerninaSans", "Open Sans", sans-serif;
+    font-size: 14px;
+    padding: 4px 8px;
+    border: 1px solid #2a2d3e;
+    border-radius: 4px;
+    background: #0b0c0e;
+    color: #e0e0e6;
+    width: 100%;
+    min-height: 300px;
+}
+
+.dashboard-select option {
+    padding: 6px 4px;
+}
+
+.dashboard-select option:checked {
+    background: #1e2846;
+    color: #6bc1ff;
+}
+
+/* ── Extension config fields ── */
+#extension-config-fields .label {
+    margin-top: 12px;
+    margin-bottom: 4px;
+    color: #8b8fa8;
+}
+
+#extension-config-fields textarea {
+    font-family: "BerninaSans", "Open Sans", sans-serif;
+    font-size: 14px;
+    padding: 8px;
+    border: 1px solid #2a2d3e;
+    border-radius: 4px;
+    background: #0b0c0e;
+    color: #e0e0e6;
+    resize: vertical;
+    width: 100%;
+    min-height: 60px;
+}
