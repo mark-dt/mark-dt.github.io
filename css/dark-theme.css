@@ -417,6 +417,78 @@ pre .null { color: #f55b5b; }
     color: #999bed;
 }
 
+/* ── Modal overlay ── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-panel {
+    background: #212138;
+    border: 1px solid #313150;
+    border-radius: 8px;
+    width: 90vw;
+    max-width: 800px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #313150;
+}
+
+.modal-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #999bed;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #999bed;
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #ebecff;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow: auto;
+    flex: 1;
+}
+
+.modal-body pre {
+    background: #19192c;
+    border: 1px solid #313150;
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #ebecff;
+    margin: 0;
+}
+
+/* ── Extension config fields ── */
 #extension-config-fields textarea {
     font-family: "BerninaSans", "Open Sans", sans-serif;
     font-size: 14px;

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backtrace Viewer — DT Tools</title>
+    <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <style>
+        /* ── Backtrace-specific styles ── */
+        .backtrace-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px 32px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #999bed;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: #a8abfe;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb .sep {
+            color: #4a4b78;
+        }
+
+        .breadcrumb .active {
+            color: #ebecff;
+            font-weight: 600;
+        }
+
+        .info-banner {
+            background: #292944;
+            border: 1px solid #42426a;
+            border-left: 3px solid #f5a623;
+            border-radius: 4px;
+            padding: 10px 16px;
+            font-size: 0.82rem;
+            color: #ebecff;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .info-banner .banner-icon {
+            color: #f5a623;
+            margin-right: 6px;
+        }
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed #42426a;
+            border-radius: 8px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 150ms, background 150ms;
+            margin-bottom: 24px;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #a8abfe;
+            background: rgba(168, 171, 254, 0.05);
+        }
+
+        .upload-area p {
+            color: #999bed;
+            margin: 8px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .upload-area .upload-icon {
+            font-size: 2rem;
+            color: #4a4b78;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Backtrace tree table */
+        .bt-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            table-layout: fixed;
+        }
+
+        .bt-table th {
+            background: #212138;
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+            color: #999bed;
+            border-bottom: 2px solid #313150;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .bt-table th:first-child {
+            width: 55%;
+        }
+
+        .bt-table th:nth-child(2),
+        .bt-table th:nth-child(3) {
+            width: 18%;
+        }
+
+        .bt-table th:nth-child(4) {
+            width: 9%;
+        }
+
+        .bt-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #292944;
+            color: #ebecff;
+            vertical-align: top;
+        }
+
+        .bt-table tr:hover td {
+            background: #292944;
+        }
+
+        .bt-table tr.root-row td {
+            background: #1e1e35;
+            font-weight: 600;
+        }
+
+        .bt-table tr.root-row:hover td {
+            background: #252545;
+        }
+
+        /* Tree structure */
+        .tree-cell {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .tree-indent {
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .tree-guide {
+            display: inline-block;
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .tree-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #42426a;
+            border-radius: 3px;
+            background: #19192c;
+            color: #999bed;
+            cursor: pointer;
+            font-size: 10px;
+            flex-shrink: 0;
+            transition: border-color 100ms;
+            user-select: none;
+            margin-top: 2px;
+        }
+
+        .tree-toggle:hover {
+            border-color: #a8abfe;
+            color: #a8abfe;
+        }
+
+        .tree-toggle.leaf {
+            visibility: hidden;
+        }
+
+        .tree-toggle.collapsed::after {
+            content: "\25B6";
+        }
+
+        .tree-toggle.expanded::after {
+            content: "\25BC";
+        }
+
+        /* Service icon */
+        .svc-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 1px;
+        }
+
+        .svc-icon.database {
+            background: #2d6a4f;
+            color: #73dca2;
+        }
+
+        .svc-icon.web-service {
+            background: #1a3a5c;
+            color: #5dade2;
+        }
+
+        .svc-icon.web-request {
+            background: #4a3560;
+            color: #d4a0ff;
+        }
+
+        .svc-icon.process {
+            background: #5c4a1a;
+            color: #f5c842;
+        }
+
+        .svc-icon.default {
+            background: #39395d;
+            color: #999bed;
+        }
+
+        /* Service info */
+        .svc-info {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .svc-name {
+            font-weight: 600;
+            color: #ebecff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .svc-detail {
+            font-size: 0.75rem;
+            color: #4a4b78;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 1px;
+        }
+
+        /* Metrics */
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .metric .count {
+            color: #ebecff;
+        }
+
+        .metric .label {
+            color: #4a4b78;
+            font-size: 0.78rem;
+        }
+
+        .error-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(245, 91, 91, 0.15);
+            color: #f55b5b;
+            border-radius: 3px;
+            padding: 1px 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Actions */
+        .action-btn {
+            background: none;
+            border: 1px solid #42426a;
+            border-radius: 4px;
+            color: #999bed;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 100ms;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            border-color: #a8abfe;
+            color: #a8abfe;
+        }
+
+        /* Truncated indicator */
+        .truncated-badge {
+            display: inline-block;
+            background: rgba(245, 166, 35, 0.15);
+            color: #f5a623;
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        /* Summary bar */
+        .summary-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .summary-item {
+            font-size: 0.85rem;
+            color: #999bed;
+        }
+
+        .summary-item strong {
+            color: #ebecff;
+        }
+
+        /* Hidden rows */
+        .bt-table tr.hidden {
+            display: none;
+        }
+
+        /* Filter / toolbar */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar .search-input {
+            font-family: "BerninaSans", "Open Sans", sans-serif;
+            font-size: 13px;
+            background: #19192c;
+            color: #ebecff;
+            border: 1px solid #42426a;
+            border-radius: 4px;
+            padding: 6px 10px;
+            width: 280px;
+            max-width: 100%;
+        }
+
+        .toolbar .search-input:focus {
+            border-color: #a8abfe;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(168, 171, 254, 0.2);
+        }
+
+        .toolbar .search-input::placeholder {
+            color: #4a4b78;
+        }
+
+        /* Modal for JSON detail */
+        .detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .detail-overlay.hidden {
+            display: none;
+        }
+
+        .detail-panel {
+            background: #212138;
+            border: 1px solid #313150;
+            border-radius: 8px;
+            width: 90vw;
+            max-width: 700px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid #313150;
+        }
+
+        .detail-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #999bed;
+        }
+
+        .detail-close {
+            background: none;
+            border: none;
+            color: #999bed;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .detail-close:hover {
+            color: #ebecff;
+        }
+
+        .detail-body {
+            padding: 24px;
+            overflow: auto;
+            flex: 1;
+        }
+
+        .detail-body pre {
+            background: #19192c;
+            border: 1px solid #313150;
+            border-radius: 6px;
+            padding: 16px;
+            overflow: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: #ebecff;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav has-no-secondary">
+        <a class="nav__brand" href="index.html">
+            <img class="nav__logo" src="dynatrace-logo.svg" alt="dynatrace logo" />
+        </a>
+    </div>
+
+    <div class="page-container">
+        <h1 class="page-title">Backtrace Viewer</h1>
+
+        <div class="card" id="upload-card">
+            <div class="card-title">Import backtrace</div>
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">&#128194;</div>
+                <p>Drop a backtrace JSON file here or click to browse</p>
+            </div>
+            <input type="file" id="file-input" accept=".json,application/json" multiple />
+        </div>
+    </div>
+
+    <div class="backtrace-container" id="results" style="display:none;">
+        <div class="breadcrumb" id="breadcrumb"></div>
+
+        <div class="info-banner" id="info-banner">
+            <span class="banner-icon">&#9888;</span>
+            Compiled data is an approximation of dependency traces. Request counts might be inaccurate.
+            Apply filters or drilldowns to services to refine the data.
+        </div>
+
+        <div class="summary-bar" id="summary-bar"></div>
+
+        <div class="toolbar">
+            <input type="text" class="search-input" id="search-input" placeholder="Filter services..." />
+            <button class="btn" id="expand-all-btn">Expand all</button>
+            <button class="btn" id="collapse-all-btn">Collapse all</button>
+        </div>
+
+        <div class="table-wrap">
+            <table class="bt-table" id="bt-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Incoming calls</th>
+                        <th>Outgoing calls</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bt-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detail modal -->
+    <div class="detail-overlay hidden" id="detail-overlay">
+        <div class="detail-panel">
+            <div class="detail-header">
+                <span class="detail-title" id="detail-title">Service details</span>
+                <button class="detail-close" id="detail-close">&times;</button>
+            </div>
+            <div class="detail-body">
+                <pre id="detail-json"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const resultsEl = document.getElementById('results');
+            const uploadCard = document.getElementById('upload-card');
+            const breadcrumb = document.getElementById('breadcrumb');
+            const summaryBar = document.getElementById('summary-bar');
+            const infoBanner = document.getElementById('info-banner');
+            const btBody = document.getElementById('bt-body');
+            const searchInput = document.getElementById('search-input');
+            const detailOverlay = document.getElementById('detail-overlay');
+            const detailTitle = document.getElementById('detail-title');
+            const detailJson = document.getElementById('detail-json');
+            const detailClose = document.getElementById('detail-close');
+            const expandAllBtn = document.getElementById('expand-all-btn');
+            const collapseAllBtn = document.getElementById('collapse-all-btn');
+
+            let allRows = [];
+            let nodeDataMap = {};
+
+            // ── File handling ──
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+            fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+            function handleFiles(files) {
+                if (!files.length) return;
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        renderBacktrace(data);
+                    } catch (err) {
+                        alert('Failed to parse JSON: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // ── Icon helpers ──
+            function getIconClass(node) {
+                const st = (node.serviceType || '').toLowerCase();
+                if (st === 'database') return 'database';
+                if (st === 'webservice') return 'web-service';
+                if (st === 'webrequest') return 'web-request';
+                if (st === 'process') return 'process';
+                return 'default';
+            }
+
+            function getIconLabel(node) {
+                const icon = node.unifiedIcon?.primaryType || '';
+                if (icon.includes('Oracle')) return 'Or';
+                if (icon.includes('Netty')) return 'Nt';
+                if (icon.includes('WebRequest')) return 'Rq';
+                const st = (node.serviceType || '').toLowerCase();
+                if (st === 'database') return 'DB';
+                if (st === 'process') return 'Bg';
+                return 'Sv';
+            }
+
+            // ── Format numbers ──
+            function fmtNum(n) {
+                if (n == null) return '—';
+                return n.toLocaleString();
+            }
+
+            // ── Flatten tree into rows ──
+            function flattenTree(node, depth, parentId, rows) {
+                const id = 'n' + rows.length;
+                const callers = node.callers || [];
+                const hasChildren = callers.length > 0;
+                const runsOn = (node.runsOnNames || []).join(', ');
+
+                rows.push({
+                    id,
+                    parentId,
+                    depth,
+                    node,
+                    hasChildren,
+                    expanded: depth < 1,
+                    visible: depth <= 1,
+                    serviceName: node.serviceName || 'Unknown',
+                    runsOn,
+                    callCount: node.callCount || 0,
+                    errorCount: node.errorCount || 0,
+                    childCallCount: node.childCallCount || 0,
+                    isRoot: node.root === true,
+                    truncated: node.truncated === true,
+                    childIds: []
+                });
+
+                nodeDataMap[id] = node;
+
+                for (const caller of callers) {
+                    const childId = flattenTree(caller, depth + 1, id, rows);
+                    rows.find(r => r.id === id).childIds.push(childId);
+                }
+
+                return id;
+            }
+
+            // ── Render ──
+            function renderBacktrace(data) {
+                const root = data.root;
+                if (!root) {
+                    alert('No "root" key found in JSON.');
+                    return;
+                }
+
+                uploadCard.style.display = 'none';
+                resultsEl.style.display = 'block';
+                infoBanner.style.display = 'block';
+
+                // Breadcrumb
+                const rootName = root.serviceName || 'Service';
+                breadcrumb.innerHTML =
+                    '<a href="#">Discover</a><span class="sep">›</span>' +
+                    '<a href="#">' + escHtml(rootName) + '</a><span class="sep">›</span>' +
+                    '<a href="#">Details</a><span class="sep">›</span>' +
+                    '<span class="active">Backtrace</span>';
+
+                // Timeframe
+                if (data.timeframe) {
+                    const tf = data.timeframe;
+                    const start = new Date(tf.startTime);
+                    const end = new Date(tf.endTime);
+                    const fmt = (d) => d.toLocaleString();
+                    summaryBar.innerHTML =
+                        '<span class="summary-item"><strong>Timeframe:</strong> ' + fmt(start) + ' — ' + fmt(end) + '</span>';
+                }
+
+                // Flatten
+                allRows = [];
+                nodeDataMap = {};
+                flattenTree(root, 0, null, allRows);
+
+                // Summary
+                const totalServices = new Set(allRows.map(r => r.node.serviceId)).size;
+                summaryBar.innerHTML += '<span class="summary-item"><strong>' + totalServices + '</strong> services</span>';
+                summaryBar.innerHTML += '<span class="summary-item"><strong>' + allRows.length + '</strong> nodes</span>';
+
+                renderTable();
+            }
+
+            function renderTable() {
+                btBody.innerHTML = '';
+
+                for (const row of allRows) {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = row.id;
+                    tr.dataset.depth = row.depth;
+                    if (row.parentId) tr.dataset.parentId = row.parentId;
+                    if (row.isRoot) tr.classList.add('root-row');
+                    if (!row.visible) tr.classList.add('hidden');
+
+                    // Service cell
+                    const tdSvc = document.createElement('td');
+                    const treeCell = document.createElement('div');
+                    treeCell.className = 'tree-cell';
+
+                    // Indentation
+                    const indent = document.createElement('span');
+                    indent.className = 'tree-indent';
+                    for (let i = 0; i < row.depth; i++) {
+                        const guide = document.createElement('span');
+                        guide.className = 'tree-guide';
+                        indent.appendChild(guide);
+                    }
+                    treeCell.appendChild(indent);
+
+                    // Toggle
+                    const toggle = document.createElement('span');
+                    toggle.className = 'tree-toggle ' + (row.hasChildren ? (row.expanded ? 'expanded' : 'collapsed') : 'leaf');
+                    toggle.dataset.id = row.id;
+                    if (row.hasChildren) {
+                        toggle.addEventListener('click', () => toggleRow(row.id));
+                    }
+                    treeCell.appendChild(toggle);
+
+                    // Icon
+                    const icon = document.createElement('span');
+                    icon.className = 'svc-icon ' + getIconClass(row.node);
+                    icon.textContent = getIconLabel(row.node);
+                    treeCell.appendChild(icon);
+
+                    // Service info
+                    const info = document.createElement('div');
+                    info.className = 'svc-info';
+                    let nameHtml = '<div class="svc-name">' + escHtml(row.serviceName);
+                    if (row.truncated) {
+                        nameHtml += '<span class="truncated-badge">truncated</span>';
+                    }
+                    nameHtml += '</div>';
+                    if (row.runsOn) {
+                        nameHtml += '<div class="svc-detail">' + escHtml(row.runsOn) + '</div>';
+                    }
+                    info.innerHTML = nameHtml;
+                    treeCell.appendChild(info);
+
+                    tdSvc.appendChild(treeCell);
+                    tr.appendChild(tdSvc);
+
+                    // Incoming calls
+                    const tdIn = document.createElement('td');
+                    let inHtml = '<div class="metric"><span class="count">' + fmtNum(row.callCount) + '</span><span class="label">requests</span>';
+                    if (row.errorCount > 0) {
+                        inHtml += '<span class="error-badge">' + fmtNum(row.errorCount) + ' errors</span>';
+                    }
+                    inHtml += '</div>';
+                    tdIn.innerHTML = inHtml;
+                    tr.appendChild(tdIn);
+
+                    // Outgoing calls
+                    const tdOut = document.createElement('td');
+                    tdOut.innerHTML = '<div class="metric"><span class="count">' + fmtNum(row.childCallCount) + '</span><span class="label">calls</span></div>';
+                    tr.appendChild(tdOut);
+
+                    // Actions
+                    const tdAct = document.createElement('td');
+                    const detBtn = document.createElement('button');
+                    detBtn.className = 'action-btn';
+                    detBtn.textContent = 'Details';
+                    detBtn.addEventListener('click', () => showDetail(row.id));
+                    tdAct.appendChild(detBtn);
+                    tr.appendChild(tdAct);
+
+                    btBody.appendChild(tr);
+                }
+            }
+
+            // ── Toggle expand / collapse ──
+            function toggleRow(id) {
+                const row = allRows.find(r => r.id === id);
+                if (!row) return;
+                row.expanded = !row.expanded;
+
+                const toggle = btBody.querySelector('.tree-toggle[data-id="' + id + '"]');
+                if (toggle) {
+                    toggle.classList.toggle('expanded', row.expanded);
+                    toggle.classList.toggle('collapsed', !row.expanded);
+                }
+
+                updateChildVisibility(id, row.expanded);
+            }
+
+            function updateChildVisibility(parentId, visible) {
+                const parent = allRows.find(r => r.id === parentId);
+                if (!parent) return;
+
+                for (const childId of parent.childIds) {
+                    const child = allRows.find(r => r.id === childId);
+                    if (!child) continue;
+                    child.visible = visible;
+                    const tr = btBody.querySelector('tr[data-id="' + childId + '"]');
+                    if (tr) tr.classList.toggle('hidden', !visible);
+
+                    if (child.hasChildren) {
+                        if (!visible) {
+                            updateChildVisibility(childId, false);
+                        } else if (child.expanded) {
+                            updateChildVisibility(childId, true);
+                        }
+                    }
+                }
+            }
+
+            // ── Expand / Collapse all ──
+            expandAllBtn.addEventListener('click', () => {
+                for (const row of allRows) {
+                    row.expanded = true;
+                    row.visible = true;
+                }
+                btBody.querySelectorAll('tr').forEach(tr => tr.classList.remove('hidden'));
+                btBody.querySelectorAll('.tree-toggle:not(.leaf)').forEach(t => {
+                    t.classList.remove('collapsed');
+                    t.classList.add('expanded');
+                });
+            });
+
+            collapseAllBtn.addEventListener('click', () => {
+                for (const row of allRows) {
+                    if (row.depth === 0) {
+                        row.expanded = false;
+                        row.visible = true;
+                    } else {
+                        row.expanded = false;
+                        row.visible = false;
+                    }
+                }
+                btBody.querySelectorAll('tr').forEach(tr => {
+                    const depth = parseInt(tr.dataset.depth);
+                    tr.classList.toggle('hidden', depth > 0);
+                });
+                btBody.querySelectorAll('.tree-toggle:not(.leaf)').forEach(t => {
+                    t.classList.remove('expanded');
+                    t.classList.add('collapsed');
+                });
+            });
+
+            // ── Search / filter ──
+            searchInput.addEventListener('input', () => {
+                const q = searchInput.value.toLowerCase().trim();
+                if (!q) {
+                    // Restore normal visibility
+                    for (const row of allRows) {
+                        row.visible = row.depth === 0 || (allRows.find(r => r.id === row.parentId)?.expanded && allRows.find(r => r.id === row.parentId)?.visible);
+                    }
+                    btBody.querySelectorAll('tr').forEach(tr => {
+                        const row = allRows.find(r => r.id === tr.dataset.id);
+                        tr.classList.toggle('hidden', row ? !row.visible : true);
+                    });
+                    return;
+                }
+
+                // Show matching rows and their ancestors
+                const matchIds = new Set();
+                for (const row of allRows) {
+                    if (row.serviceName.toLowerCase().includes(q) ||
+                        (row.runsOn && row.runsOn.toLowerCase().includes(q))) {
+                        matchIds.add(row.id);
+                        // Walk up to root
+                        let pid = row.parentId;
+                        while (pid) {
+                            matchIds.add(pid);
+                            const p = allRows.find(r => r.id === pid);
+                            pid = p ? p.parentId : null;
+                        }
+                    }
+                }
+
+                btBody.querySelectorAll('tr').forEach(tr => {
+                    tr.classList.toggle('hidden', !matchIds.has(tr.dataset.id));
+                });
+            });
+
+            // ── Detail modal ──
+            function showDetail(id) {
+                const node = nodeDataMap[id];
+                if (!node) return;
+                // Show a clean version without nested callers
+                const clean = Object.assign({}, node);
+                delete clean.callers;
+                delete clean.methods;
+                delete clean.instances;
+                detailTitle.textContent = node.serviceName || 'Service details';
+                detailJson.textContent = JSON.stringify(clean, null, 2);
+                detailOverlay.classList.remove('hidden');
+            }
+
+            detailClose.addEventListener('click', () => detailOverlay.classList.add('hidden'));
+            detailOverlay.addEventListener('click', (e) => {
+                if (e.target === detailOverlay) detailOverlay.classList.add('hidden');
+            });
+
+            function escHtml(s) {
+                const d = document.createElement('div');
+                d.textContent = s;
+                return d.innerHTML;
+            }
+        })();
+    </script>
+
+</body>
+
+</html>
