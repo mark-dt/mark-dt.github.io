@@ -8,70 +8,13 @@
     <title>DT Tools</title>
     <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
     <link rel="stylesheet" href="css/main.css" />
-    <style>
-        .landing {
-            max-width: 900px;
-            margin: 60px auto;
-            padding: 0 24px;
-        }
-
-        .landing h1 {
-            font-size: 1.8rem;
-            font-weight: 300;
-            margin-bottom: 0.4rem;
-            color: #454646;
-        }
-
-        .landing p.subtitle {
-            color: #6f7071;
-            font-size: 1rem;
-            margin-bottom: 48px;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-        }
-
-        .tool-card {
-            background: #fff;
-            border-radius: 6px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            padding: 32px 28px;
-            transition: box-shadow 150ms ease-out, transform 150ms ease-out;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .tool-card:hover {
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .tool-card h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #1496ff;
-        }
-
-        .tool-card p {
-            font-size: 0.9rem;
-            color: #6f7071;
-            margin: 0;
-            line-height: 1.5;
-        }
-    </style>
+    <link rel="stylesheet" href="css/dark-theme.css" />
 </head>
 
 <body>
 
     <div class="nav has-no-secondary">
-        <a class="nav__brand" href="home.html">
+        <a class="nav__brand" href="index.html">
             <img class="nav__logo" src="dynatrace-logo.svg" alt="dynatrace logo" />
         </a>
     </div>
@@ -94,6 +37,11 @@
             <a class="tool-card" href="dashboards/index.html">
                 <h2>Dashboard Marketplace</h2>
                 <p>Browse and deploy pre-built dashboards to your Dynatrace tenant.</p>
+            </a>
+
+            <a class="tool-card" href="backtrace.html">
+                <h2>Backtrace Viewer</h2>
+                <p>Import and visualize Dynatrace service backtrace JSON files as an interactive tree.</p>
             </a>
         </div>
     </div>
