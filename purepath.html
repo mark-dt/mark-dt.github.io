@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PurePath Viewer — DT Tools</title>
+    <link rel="icon" type="image/png" href="https://dt-cdn.net/images/favicon-48x48-transparent-48-9b4df9c769.png">
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/dark-theme.css" />
+    <style>
+        .pp-page { max-width: 1600px; margin: 0 auto; padding: 0 24px 48px; }
+
+        /* Upload */
+        .upload-area {
+            border: 2px dashed #42426a; border-radius: 8px; padding: 48px 24px;
+            text-align: center; cursor: pointer; transition: border-color 150ms, background 150ms;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: #a8abfe; background: rgba(168,171,254,.05); }
+        .upload-area p { color: #999bed; margin: 8px 0 0; font-size: .9rem; }
+        .upload-area .upload-icon { font-size: 2rem; color: #4a4b78; }
+        #file-input { display: none; }
+
+        /* Header bar */
+        .pp-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .pp-header h2 { font-size: 1.1rem; font-weight: 600; color: #ebecff; margin: 0; }
+        .pp-meta { font-size: .78rem; color: #4a4b78; }
+
+        /* Warnings */
+        .pp-warnings { margin-bottom: 12px; }
+        .pp-warning {
+            background: #292944; border: 1px solid #42426a; border-left: 3px solid #f5a623;
+            border-radius: 4px; padding: 8px 14px; font-size: .8rem; color: #ebecff; margin-bottom: 6px;
+        }
+        .pp-warning .wi { color: #f5a623; margin-right: 4px; }
+
+        /* Toolbar */
+        .pp-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .pp-toolbar .search-input {
+            font-family: inherit; font-size: 13px; background: #19192c; color: #ebecff;
+            border: 1px solid #42426a; border-radius: 4px; padding: 5px 10px; width: 300px; max-width: 100%;
+        }
+        .pp-toolbar .search-input:focus { border-color: #a8abfe; outline: none; box-shadow: 0 0 0 2px rgba(168,171,254,.2); }
+        .pp-toolbar .search-input::placeholder { color: #4a4b78; }
+
+        /* Stats bar */
+        .pp-stats { display: flex; gap: 20px; margin-bottom: 14px; flex-wrap: wrap; font-size: .82rem; color: #999bed; }
+        .pp-stats strong { color: #ebecff; }
+
+        /* ── Tree ── */
+        .pp-tree { font-family: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace; font-size: 12.5px; line-height: 1.6; }
+        .pp-row {
+            display: flex; align-items: flex-start; gap: 0; white-space: nowrap;
+            padding: 1px 0; border-radius: 3px; cursor: default;
+        }
+        .pp-row:hover { background: #292944; }
+        .pp-row.hidden { display: none; }
+        .pp-row.highlight { background: rgba(168,171,254,.12); }
+
+        /* Indent guides */
+        .pp-indent { display: inline-flex; flex-shrink: 0; }
+        .pp-guide {
+            display: inline-block; width: 20px; text-align: center; color: #313150;
+            user-select: none; flex-shrink: 0;
+        }
+        .pp-guide.line::before { content: "\2502"; }   /* │ */
+        .pp-guide.branch::before { content: "\251C\2500"; font-size: 11px; } /* ├─ */
+        .pp-guide.last::before { content: "\2514\2500"; font-size: 11px; }   /* └─ */
+        .pp-guide.space::before { content: ""; }
+
+        /* Toggle */
+        .pp-toggle {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; flex-shrink: 0; cursor: pointer;
+            color: #999bed; font-size: 9px; user-select: none; margin-right: 2px; margin-top: 2px;
+        }
+        .pp-toggle:hover { color: #a8abfe; }
+        .pp-toggle.leaf { visibility: hidden; cursor: default; }
+        .pp-toggle.collapsed::after { content: "\25B6"; }
+        .pp-toggle.expanded::after { content: "\25BC"; }
+
+        /* Node icon */
+        .pp-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border-radius: 3px; flex-shrink: 0;
+            font-size: 9px; font-weight: 700; margin-right: 5px; margin-top: 1px;
+        }
+        .pp-icon.svc-web    { background: #1a3a5c; color: #5dade2; }
+        .pp-icon.svc-db      { background: #2d6a4f; color: #73dca2; }
+        .pp-icon.svc-process  { background: #5c4a1a; color: #f5c842; }
+        .pp-icon.svc-webreq  { background: #4a3560; color: #d4a0ff; }
+        .pp-icon.svc-method   { background: #39395d; color: #999bed; }
+        .pp-icon.svc-link     { background: #2a3a2a; color: #81c784; }
+
+        /* Content spans */
+        .pp-content { display: inline; overflow: hidden; text-overflow: ellipsis; }
+        .pp-type { font-weight: 600; margin-right: 4px; }
+        .pp-type.type-service { color: #5dade2; }
+        .pp-type.type-database { color: #73dca2; }
+        .pp-type.type-method { color: #999bed; }
+        .pp-type.type-link { color: #81c784; font-style: italic; }
+        .pp-type.type-process { color: #f5c842; }
+        .pp-type.type-webreq { color: #d4a0ff; }
+
+        .pp-sep { color: #42426a; margin: 0 5px; }
+        .pp-name { color: #ebecff; font-weight: 600; }
+        .pp-detail { color: #4a4b78; }
+        .pp-uri { color: #a8abfe; }
+        .pp-sql { color: #73dca2; }
+        .pp-time { color: #4a4b78; margin-left: 4px; }
+        .pp-dur { color: #999bed; margin-left: 4px; }
+        .pp-dur.slow { color: #f5a623; }
+        .pp-dur.very-slow { color: #f55b5b; }
+
+        .pp-badge {
+            display: inline-block; border-radius: 3px; padding: 0 5px;
+            font-size: 10px; font-weight: 600; margin-left: 5px; vertical-align: middle;
+        }
+        .pp-badge.trunc { background: rgba(245,166,35,.15); color: #f5a623; }
+        .pp-badge.error { background: rgba(245,91,91,.15); color: #f55b5b; }
+        .pp-badge.async { background: rgba(129,199,132,.12); color: #81c784; }
+        .pp-badge.http-err { background: rgba(245,91,91,.15); color: #f55b5b; }
+        .pp-badge.http-ok { background: rgba(115,220,162,.12); color: #73dca2; }
+
+        .pp-error-icon { color: #f55b5b; margin-left: 4px; font-size: 11px; }
+
+        /* Detail modal */
+        .detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .detail-overlay.hidden { display: none; }
+        .detail-panel { background: #212138; border: 1px solid #313150; border-radius: 8px; width: 92vw; max-width: 900px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,.5); }
+        .detail-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #313150; }
+        .detail-title { font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #999bed; }
+        .detail-close { background: none; border: none; color: #999bed; font-size: 1.4rem; cursor: pointer; padding: 0 4px; line-height: 1; }
+        .detail-close:hover { color: #ebecff; }
+        .detail-body { padding: 20px; overflow: auto; flex: 1; }
+        .detail-body pre { background: #19192c; border: 1px solid #313150; border-radius: 6px; padding: 14px; overflow: auto; font-size: .8rem; line-height: 1.5; color: #ebecff; margin: 0; white-space: pre-wrap; word-break: break-all; }
+
+        /* Timing bar (waterfall mini) */
+        .pp-waterfall {
+            position: relative; height: 6px; background: #292944; border-radius: 3px;
+            min-width: 80px; max-width: 200px; display: inline-block; vertical-align: middle; margin-left: 6px;
+        }
+        .pp-waterfall-bar {
+            position: absolute; top: 0; height: 100%; border-radius: 3px; min-width: 2px;
+        }
+        .pp-waterfall-bar.bar-exec { background: #474fcf; }
+        .pp-waterfall-bar.bar-self { background: #a8abfe; }
+        .pp-waterfall-bar.bar-error { background: #f55b5b; }
+    </style>
+</head>
+
+<body>
+
+<div class="nav has-no-secondary">
+    <a class="nav__brand" href="index.html">
+        <img class="nav__logo" src="dynatrace-logo.svg" alt="dynatrace logo" />
+    </a>
+</div>
+
+<div class="page-container">
+    <h1 class="page-title">PurePath Viewer</h1>
+    <div class="card" id="upload-card">
+        <div class="card-title">Import PurePath</div>
+        <div class="upload-area" id="upload-area">
+            <div class="upload-icon">&#128194;</div>
+            <p>Drop a .ppdump / JSON file here or click to browse</p>
+        </div>
+        <input type="file" id="file-input" accept=".ppdump,.json,application/json" />
+    </div>
+</div>
+
+<div class="pp-page" id="results" style="display:none;">
+    <div class="pp-warnings" id="pp-warnings"></div>
+    <div class="pp-header" id="pp-header"></div>
+    <div class="pp-stats" id="pp-stats"></div>
+    <div class="pp-toolbar">
+        <input type="text" class="search-input" id="search-input" placeholder="Filter by service, method, SQL, URI..." />
+        <button class="btn" id="expand-all">Expand all</button>
+        <button class="btn" id="collapse-all">Collapse all</button>
+        <button class="btn" id="collapse-methods">Services only</button>
+    </div>
+    <div class="pp-tree" id="pp-tree"></div>
+</div>
+
+<div class="detail-overlay hidden" id="detail-overlay">
+    <div class="detail-panel">
+        <div class="detail-header">
+            <span class="detail-title" id="detail-title">Node details</span>
+            <button class="detail-close" id="detail-close">&times;</button>
+        </div>
+        <div class="detail-body"><pre id="detail-json"></pre></div>
+    </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ── DOM refs ── */
+const uploadArea  = document.getElementById('upload-area');
+const fileInput   = document.getElementById('file-input');
+const resultsEl   = document.getElementById('results');
+const uploadCard  = document.getElementById('upload-card');
+const warningsEl  = document.getElementById('pp-warnings');
+const headerEl    = document.getElementById('pp-header');
+const statsEl     = document.getElementById('pp-stats');
+const treeEl      = document.getElementById('pp-tree');
+const searchInput = document.getElementById('search-input');
+const overlay     = document.getElementById('detail-overlay');
+const detailTitle = document.getElementById('detail-title');
+const detailJson  = document.getElementById('detail-json');
+const detailClose = document.getElementById('detail-close');
+
+/* ── Lookup tables (populated on load) ── */
+let entities = {}, methodsLookup = {}, callIds = {}, localpaths = {}, pathDataLookup = {};
+let rows = [];          // flat list of row descriptors
+let totalDuration = 0;  // root duration in micros
+let rootStart = 0;      // root start time in micros
+
+/* ── File handling ── */
+uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+uploadArea.addEventListener('drop', e => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+function handleFiles(files) {
+    if (!files.length) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try { render(JSON.parse(e.target.result)); }
+        catch (err) { alert('Failed to parse: ' + err.message); }
+    };
+    reader.readAsText(files[0]);
+}
+
+/* ── Helpers ── */
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function fmtDur(us) {
+    if (us == null || us === 0) return '0 \u00B5s';
+    if (us < 1000) return us + ' \u00B5s';
+    if (us < 1000000) return (us / 1000).toFixed(us < 10000 ? 2 : 1) + ' ms';
+    return (us / 1000000).toFixed(2) + ' s';
+}
+
+function fmtTs(us) {
+    // us is epoch microseconds
+    const ms = Math.floor(us / 1000);
+    const d = new Date(ms);
+    const pad = n => String(n).padStart(2, '0');
+    return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + ' ' +
+           pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + '.' +
+           String(d.getMilliseconds()).padStart(3, '0');
+}
+
+function durClass(us) {
+    if (us >= 5000000) return 'very-slow';
+    if (us >= 1000000) return 'slow';
+    return '';
+}
+
+function resolveMethod(idx) {
+    if (idx == null) return null;
+    return methodsLookup[String(idx)] || null;
+}
+
+function resolveCallId(idx) {
+    if (idx == null) return null;
+    return callIds[String(idx)] || null;
+}
+
+function resolveEntity(id) { return entities[id] || id; }
+
+function resolveLocalpath(idx) {
+    if (idx == null) return null;
+    return localpaths[String(idx)] || null;
+}
+
+function resolvePathData(idx) {
+    if (idx == null) return null;
+    return pathDataLookup[String(idx)] || null;
+}
+
+/* ── Build row descriptors from tree ── */
+function flatten(node, depth, parentIdx, isLast, guideFlags) {
+    const idx = rows.length;
+    const ntype = node.nodeType || 'METHOD';
+    const times = node.times || {};
+    const duration = times.duration != null ? times.duration : (times.serverSideResponseTime || 0);
+    const selfTime = times.selfTime || 0;
+    const startTime = times.startTime || times.serverSideStartTime || 0;
+    const children = node.children || [];
+
+    // Resolve method
+    const mRef = resolveMethod(node.method);
+    const className = mRef ? mRef['class'] || '' : '';
+    const methodName = mRef ? mRef.method || '' : '';
+
+    // Resolve service
+    const cRef = resolveCallId(node.callIdentifierId);
+    const svcId = cRef ? cRef.service || '' : '';
+    const svcName = svcId ? resolveEntity(svcId) : '';
+    const svcType = cRef ? cRef.serviceType || '' : '';
+
+    // Resolve link type
+    const lp = resolveLocalpath(node.localpath);
+    const linkType = lp ? lp.linkType || '' : '';
+
+    // Attachments
+    const attachments = node.attachments || [];
+    let httpUri = '', httpMethod = '', httpCode = null;
+    let sqlText = '';
+    let dbName = '';
+    let hasStackTrace = false;
+    let exceptionClasses = '';
+
+    for (const a of attachments) {
+        if (!Array.isArray(a) || a.length < 2) continue;
+        const [aType, aData] = a;
+        if (aType === 'ClientSideWebRequestAttachment') {
+            httpUri = aData.uri || '';
+            httpMethod = aData.method || '';
+            httpCode = aData.responseCode != null ? aData.responseCode : null;
+        } else if (aType === 'WebRequestAttachment') {
+            if (!httpUri) { httpUri = aData.uri || ''; httpMethod = aData.requestMethod || ''; }
+            if (aData.responseStatus != null) httpCode = aData.responseStatus;
+        } else if (aType === 'SqlAttachment') {
+            sqlText = aData.sql || '';
+        } else if (aType === 'ConnectionPoolAttachment') {
+            dbName = aData.dbName || '';
+        } else if (aType === 'StackTraceAttachment') {
+            hasStackTrace = true;
+        }
+    }
+
+    // Service call exception info
+    const sc = node.serviceCall || {};
+    const scAttrs = sc.serviceCallDataAttributes || {};
+    if (scAttrs.EXCEPTION_CLASSES) exceptionClasses = scAttrs.EXCEPTION_CLASSES;
+
+    const truncated = node.truncated || false;
+    const hasFlaws = node.hasFlaws || false;
+
+    const row = {
+        idx, depth, parentIdx, isLast,
+        guideFlags: guideFlags.slice(), // copy
+        ntype, duration, selfTime, startTime,
+        className, methodName, svcName, svcType, linkType,
+        httpUri, httpMethod, httpCode,
+        sqlText, dbName,
+        hasStackTrace, exceptionClasses,
+        truncated, hasFlaws,
+        hasChildren: children.length > 0,
+        childIndices: [],
+        expanded: depth < 2,
+        visible: depth <= 2,
+        node // reference for detail view
+    };
+
+    rows.push(row);
+
+    // Build child guide flags
+    const childGuides = guideFlags.slice();
+    if (depth > 0) {
+        childGuides.push(isLast ? 'space' : 'line');
+    }
+
+    for (let i = 0; i < children.length; i++) {
+        const childIdx = flatten(children[i], depth + 1, idx, i === children.length - 1, childGuides);
+        row.childIndices.push(childIdx);
+    }
+
+    return idx;
+}
+
+/* ── Build display label for a row ── */
+function buildLabel(r) {
+    let parts = [];
+
+    if (r.ntype === 'SERVICE') {
+        // Type label
+        let typeLabel = 'WebService';
+        if (r.svcType === 'Database') typeLabel = 'Database';
+        else if (r.svcType === 'Process') typeLabel = 'Process';
+        else if (r.svcType === 'WebRequest') typeLabel = 'WebRequest';
+        parts.push({ cls: 'pp-type type-' + typeLabel.toLowerCase().replace('web','webreq').replace('webservice','service').replace('webrequest','webreq').replace('process','process').replace('database','database'), text: typeLabel });
+
+        parts.push({ cls: 'pp-sep', text: '|' });
+        parts.push({ cls: 'pp-name', text: r.svcName || 'Unknown' });
+
+        if (r.httpUri) {
+            parts.push({ cls: 'pp-sep', text: '|' });
+            parts.push({ cls: 'pp-detail', text: (r.httpMethod ? r.httpMethod + ' ' : '') });
+            parts.push({ cls: 'pp-uri', text: r.httpUri });
+        }
+
+        if (r.sqlText) {
+            parts.push({ cls: 'pp-sep', text: '|' });
+            parts.push({ cls: 'pp-sql', text: truncStr(r.sqlText, 120) });
+        }
+
+    } else if (r.ntype === 'LINK') {
+        const isAsync = r.linkType === 'ASYNC';
+        parts.push({ cls: 'pp-type type-link', text: isAsync ? 'Local ASYNC link' : 'SYNC link' });
+
+    } else {
+        // METHOD node
+        const shortClass = r.className ? r.className.split('.').slice(-2).join('.') : '';
+        parts.push({ cls: 'pp-type type-method', text: r.methodName || 'method' });
+
+        if (shortClass) {
+            parts.push({ cls: 'pp-sep', text: '|' });
+            parts.push({ cls: 'pp-detail', text: shortClass });
+        }
+
+        if (r.httpUri) {
+            parts.push({ cls: 'pp-sep', text: '|' });
+            parts.push({ cls: 'pp-detail', text: r.httpMethod || '' });
+            parts.push({ cls: 'pp-uri', text: ' ' + r.httpUri });
+        }
+
+        if (r.sqlText) {
+            parts.push({ cls: 'pp-sep', text: '|' });
+            const label = r.dbName ? r.dbName + ' | ' : '';
+            parts.push({ cls: 'pp-detail', text: label });
+            parts.push({ cls: 'pp-sql', text: truncStr(r.sqlText, 120) });
+        } else if (r.dbName) {
+            parts.push({ cls: 'pp-sep', text: '|' });
+            parts.push({ cls: 'pp-detail', text: r.dbName });
+        }
+    }
+
+    // FD marker
+    if (r.ntype === 'METHOD') {
+        parts.push({ cls: 'pp-sep', text: '|' });
+        parts.push({ cls: 'pp-detail', text: 'FD' });
+    }
+
+    // Timestamp
+    if (r.startTime) {
+        parts.push({ cls: 'pp-sep', text: '|' });
+        parts.push({ cls: 'pp-time', text: fmtTs(r.startTime) });
+    }
+
+    // Duration
+    parts.push({ cls: 'pp-sep', text: '|' });
+    const dCls = 'pp-dur ' + durClass(r.duration);
+    let durLabel = fmtDur(r.duration);
+    if (r.ntype === 'SERVICE') durLabel += ' server side response time';
+    else durLabel += ' duration';
+    parts.push({ cls: dCls, text: durLabel });
+
+    return parts;
+}
+
+function truncStr(s, max) {
+    return s.length > max ? s.substring(0, max) + '...' : s;
+}
+
+/* ── Render tree ── */
+function renderTree() {
+    const frag = document.createDocumentFragment();
+
+    for (const r of rows) {
+        const div = document.createElement('div');
+        div.className = 'pp-row' + (r.visible ? '' : ' hidden');
+        div.dataset.idx = r.idx;
+        div.dataset.depth = r.depth;
+        div.addEventListener('dblclick', () => showDetail(r.idx));
+
+        // Indent guides
+        const indent = document.createElement('span');
+        indent.className = 'pp-indent';
+        // Ancestor guides
+        for (const gf of r.guideFlags) {
+            const g = document.createElement('span');
+            g.className = 'pp-guide ' + gf;
+            indent.appendChild(g);
+        }
+        // Branch connector for this node
+        if (r.depth > 0) {
+            const g = document.createElement('span');
+            g.className = 'pp-guide ' + (r.isLast ? 'last' : 'branch');
+            indent.appendChild(g);
+        }
+        div.appendChild(indent);
+
+        // Toggle
+        const toggle = document.createElement('span');
+        toggle.className = 'pp-toggle ' + (r.hasChildren ? (r.expanded ? 'expanded' : 'collapsed') : 'leaf');
+        toggle.dataset.idx = r.idx;
+        if (r.hasChildren) toggle.addEventListener('click', e => { e.stopPropagation(); toggleRow(r.idx); });
+        div.appendChild(toggle);
+
+        // Icon
+        const icon = document.createElement('span');
+        let iconCls = 'pp-icon ';
+        let iconTxt = '';
+        if (r.ntype === 'SERVICE') {
+            if (r.svcType === 'Database') { iconCls += 'svc-db'; iconTxt = 'DB'; }
+            else if (r.svcType === 'Process') { iconCls += 'svc-process'; iconTxt = 'Bg'; }
+            else if (r.svcType === 'WebRequest') { iconCls += 'svc-webreq'; iconTxt = 'Rq'; }
+            else { iconCls += 'svc-web'; iconTxt = 'Sv'; }
+        } else if (r.ntype === 'LINK') {
+            iconCls += 'svc-link'; iconTxt = 'Lk';
+        } else {
+            iconCls += 'svc-method'; iconTxt = 'M';
+        }
+        icon.className = iconCls;
+        icon.textContent = iconTxt;
+        div.appendChild(icon);
+
+        // Content
+        const content = document.createElement('span');
+        content.className = 'pp-content';
+
+        const labelParts = buildLabel(r);
+        for (const p of labelParts) {
+            const s = document.createElement('span');
+            s.className = p.cls;
+            s.textContent = p.text;
+            content.appendChild(s);
+        }
+
+        // Badges
+        if (r.truncated) {
+            const b = document.createElement('span');
+            b.className = 'pp-badge trunc';
+            b.textContent = 'TREE TRUNCATED BY ANALYZER';
+            content.appendChild(b);
+        }
+        if (r.hasFlaws) {
+            const b = document.createElement('span');
+            b.className = 'pp-badge error';
+            b.textContent = 'FLAW';
+            content.appendChild(b);
+        }
+        if (r.linkType === 'ASYNC' && r.ntype !== 'LINK') {
+            const b = document.createElement('span');
+            b.className = 'pp-badge async';
+            b.textContent = 'ASYNC';
+            content.appendChild(b);
+        }
+        if (r.httpCode != null && r.httpCode >= 400) {
+            const b = document.createElement('span');
+            b.className = 'pp-badge http-err';
+            b.textContent = r.httpCode;
+            content.appendChild(b);
+        } else if (r.httpCode != null && r.httpCode > 0) {
+            const b = document.createElement('span');
+            b.className = 'pp-badge http-ok';
+            b.textContent = r.httpCode;
+            content.appendChild(b);
+        }
+
+        // Mini waterfall bar
+        if (totalDuration > 0 && r.duration > 0) {
+            const wf = document.createElement('span');
+            wf.className = 'pp-waterfall';
+            const bar = document.createElement('span');
+            const pct = Math.max(1, (r.duration / totalDuration) * 100);
+            const offset = r.startTime && rootStart ? Math.max(0, ((r.startTime - rootStart) / totalDuration) * 100) : 0;
+            bar.className = 'pp-waterfall-bar ' + (r.hasFlaws || (r.httpCode >= 400) ? 'bar-error' : 'bar-exec');
+            bar.style.left = Math.min(offset, 98) + '%';
+            bar.style.width = Math.min(pct, 100 - Math.min(offset, 98)) + '%';
+            wf.appendChild(bar);
+            content.appendChild(wf);
+        }
+
+        div.appendChild(content);
+        frag.appendChild(div);
+    }
+
+    treeEl.innerHTML = '';
+    treeEl.appendChild(frag);
+}
+
+/* ── Toggle ── */
+function toggleRow(idx) {
+    const r = rows[idx];
+    r.expanded = !r.expanded;
+    const toggle = treeEl.querySelector('.pp-toggle[data-idx="' + idx + '"]');
+    if (toggle) {
+        toggle.classList.toggle('expanded', r.expanded);
+        toggle.classList.toggle('collapsed', !r.expanded);
+    }
+    setChildVisibility(idx, r.expanded);
+}
+
+function setChildVisibility(parentIdx, visible) {
+    for (const ci of rows[parentIdx].childIndices) {
+        const child = rows[ci];
+        child.visible = visible;
+        const el = treeEl.querySelector('.pp-row[data-idx="' + ci + '"]');
+        if (el) el.classList.toggle('hidden', !visible);
+        if (!visible) {
+            setChildVisibility(ci, false);
+        } else if (child.expanded) {
+            setChildVisibility(ci, true);
+        }
+    }
+}
+
+/* ── Toolbar ── */
+document.getElementById('expand-all').addEventListener('click', () => {
+    for (const r of rows) { r.expanded = true; r.visible = true; }
+    treeEl.querySelectorAll('.pp-row').forEach(el => el.classList.remove('hidden'));
+    treeEl.querySelectorAll('.pp-toggle:not(.leaf)').forEach(t => { t.classList.remove('collapsed'); t.classList.add('expanded'); });
+});
+
+document.getElementById('collapse-all').addEventListener('click', () => {
+    for (const r of rows) { r.expanded = r.depth === 0; r.visible = r.depth === 0; }
+    treeEl.querySelectorAll('.pp-row').forEach(el => el.classList.toggle('hidden', parseInt(el.dataset.depth) > 0));
+    treeEl.querySelectorAll('.pp-toggle:not(.leaf)').forEach(t => { t.classList.remove('expanded'); t.classList.add('collapsed'); });
+    // re-expand root
+    const rootToggle = treeEl.querySelector('.pp-toggle[data-idx="0"]');
+    if (rootToggle) { rootToggle.classList.add('expanded'); rootToggle.classList.remove('collapsed'); }
+});
+
+document.getElementById('collapse-methods').addEventListener('click', () => {
+    // Show only SERVICE and LINK nodes + their ancestors
+    const showSet = new Set();
+    for (const r of rows) {
+        if (r.ntype === 'SERVICE' || r.ntype === 'LINK') {
+            showSet.add(r.idx);
+            let p = r.parentIdx;
+            while (p != null) { showSet.add(p); p = rows[p].parentIdx; }
+        }
+    }
+    for (const r of rows) {
+        r.visible = showSet.has(r.idx);
+        r.expanded = r.visible && r.hasChildren;
+    }
+    treeEl.querySelectorAll('.pp-row').forEach(el => {
+        const i = parseInt(el.dataset.idx);
+        el.classList.toggle('hidden', !showSet.has(i));
+    });
+    treeEl.querySelectorAll('.pp-toggle:not(.leaf)').forEach(t => {
+        const i = parseInt(t.dataset.idx);
+        t.classList.toggle('expanded', rows[i].expanded);
+        t.classList.toggle('collapsed', !rows[i].expanded);
+    });
+});
+
+/* ── Search ── */
+searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase().trim();
+    if (!q) {
+        // Restore state based on expanded flags
+        for (const r of rows) {
+            if (r.depth === 0) r.visible = true;
+            else {
+                const parent = rows[r.parentIdx];
+                r.visible = parent.visible && parent.expanded;
+            }
+        }
+        treeEl.querySelectorAll('.pp-row').forEach(el => {
+            const r = rows[parseInt(el.dataset.idx)];
+            el.classList.toggle('hidden', !r.visible);
+            el.classList.remove('highlight');
+        });
+        return;
+    }
+
+    const matchSet = new Set();
+    for (const r of rows) {
+        const haystack = [r.svcName, r.methodName, r.className, r.httpUri, r.sqlText, r.dbName].join(' ').toLowerCase();
+        if (haystack.includes(q)) {
+            matchSet.add(r.idx);
+            let p = r.parentIdx;
+            while (p != null) { matchSet.add(p); p = rows[p].parentIdx; }
+        }
+    }
+    treeEl.querySelectorAll('.pp-row').forEach(el => {
+        const i = parseInt(el.dataset.idx);
+        el.classList.toggle('hidden', !matchSet.has(i));
+        const r = rows[i];
+        const haystack = [r.svcName, r.methodName, r.className, r.httpUri, r.sqlText, r.dbName].join(' ').toLowerCase();
+        el.classList.toggle('highlight', haystack.includes(q));
+    });
+});
+
+/* ── Detail modal ── */
+function showDetail(idx) {
+    const r = rows[idx];
+    const n = r.node;
+    // Build clean view
+    const clean = Object.assign({}, n);
+    delete clean.children;
+    // Resolve references
+    const extra = {};
+    const mRef = resolveMethod(n.method);
+    if (mRef) extra.resolvedMethod = mRef;
+    const cRef = resolveCallId(n.callIdentifierId);
+    if (cRef) {
+        extra.resolvedService = { ...cRef };
+        if (cRef.service) extra.resolvedService.serviceName = resolveEntity(cRef.service);
+    }
+    const pd = resolvePathData(n.pathData);
+    if (pd) extra.threadInfo = pd;
+    clean._resolved = extra;
+
+    detailTitle.textContent = r.svcName || r.className + '.' + r.methodName || 'Node';
+    detailJson.textContent = JSON.stringify(clean, null, 2);
+    overlay.classList.remove('hidden');
+}
+detailClose.addEventListener('click', () => overlay.classList.add('hidden'));
+overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.add('hidden'); });
+
+/* ── Main render ── */
+function render(data) {
+    entities = data.entities || {};
+    methodsLookup = data.methods || {};
+    callIds = data.callIdentifierIds || {};
+    localpaths = data.localpaths || {};
+    pathDataLookup = data.pathData || {};
+
+    const pp = (data.purepaths || [])[0];
+    if (!pp || !pp.rootNode) { alert('No purepath data found.'); return; }
+
+    uploadCard.style.display = 'none';
+    resultsEl.style.display = 'block';
+
+    // Warnings
+    warningsEl.innerHTML = '';
+    for (const w of data.warnings || []) {
+        warningsEl.innerHTML += '<div class="pp-warning"><span class="wi">&#9888;</span>' + esc(w.warning) + '</div>';
+    }
+
+    // Root info
+    const root = pp.rootNode;
+    const rootTimes = root.times || {};
+    totalDuration = rootTimes.serverSideResponseTime || rootTimes.duration || 0;
+    rootStart = rootTimes.serverSideStartTime || rootTimes.startTime || 0;
+
+    const cRef = resolveCallId(root.callIdentifierId);
+    const svcId = cRef ? cRef.service || '' : '';
+    const svcName = svcId ? resolveEntity(svcId) : 'Unknown';
+
+    headerEl.innerHTML = '<h2>' + esc(svcName) + '</h2><span class="pp-meta">' + fmtDur(totalDuration) + ' &middot; ' + fmtTs(rootStart) + '</span>';
+
+    // Flatten
+    rows = [];
+    flatten(root, 0, null, true, []);
+
+    // Stats
+    const svcCount = new Set(rows.filter(r => r.ntype === 'SERVICE').map(r => r.svcName)).size;
+    const dbNodes = rows.filter(r => r.svcType === 'Database').length;
+    const httpNodes = rows.filter(r => r.httpUri).length;
+    statsEl.innerHTML =
+        '<span><strong>' + rows.length + '</strong> nodes</span>' +
+        '<span><strong>' + svcCount + '</strong> services</span>' +
+        '<span><strong>' + dbNodes + '</strong> DB calls</span>' +
+        '<span><strong>' + httpNodes + '</strong> HTTP calls</span>';
+
+    renderTree();
+}
+
+})();
+</script>
+
+</body>
+</html>

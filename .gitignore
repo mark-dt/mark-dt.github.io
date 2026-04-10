@@ -1,0 +1,4 @@
+*.ppdump
+*.json
+*.DS_Store
+*.swp
