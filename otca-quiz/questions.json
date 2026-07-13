@@ -1,0 +1,1892 @@
+{
+ "meta": {
+  "title": "OTCA practice question bank",
+  "domains": {
+   "1": "Fundamentals of Observability (18%)",
+   "2": "The OpenTelemetry API & SDK (46%)",
+   "3": "The OpenTelemetry Collector (26%)",
+   "4": "Maintaining & Debugging Observability Pipelines (10%)"
+  },
+  "note": "answer is a 0-based index into options. Add your own questions freely."
+ },
+ "questions": [
+  {
+   "domain": 1,
+   "q": "What best distinguishes observability from monitoring?",
+   "options": [
+    "Observability uses dashboards; monitoring uses alerts",
+    "Observability lets you ask new, unanticipated questions from system outputs; monitoring answers predefined questions",
+    "Observability applies only to Kubernetes; monitoring applies to VMs",
+    "Monitoring collects traces; observability collects metrics"
+   ],
+   "answer": 1,
+   "explain": "Monitoring answers known questions; observability lets you explore unknown-unknowns without redeploying.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/observability-primer/",
+     "label": "Observability primer"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/glossary/",
+     "label": "Glossary"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "Which of the following does the OpenTelemetry project deliberately NOT provide?",
+   "options": [
+    "A wire protocol for telemetry",
+    "Language SDKs",
+    "A storage backend and visualization UI",
+    "Semantic conventions"
+   ],
+   "answer": 2,
+   "explain": "OTel generates, collects, processes and exports telemetry; storage, querying and dashboards are left to backends like Prometheus, Jaeger, Grafana or vendors.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+     "label": "What is OpenTelemetry?"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/components/",
+     "label": "OTel components"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "OpenTelemetry was created in 2019 by merging which two projects?",
+   "options": [
+    "Prometheus and Jaeger",
+    "OpenTracing and OpenCensus",
+    "Zipkin and StatsD",
+    "Fluentd and OpenMetrics"
+   ],
+   "answer": 1,
+   "explain": "OpenTracing + OpenCensus merged into OpenTelemetry under the CNCF in 2019.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+     "label": "What is OpenTelemetry? (history)"
+    },
+    {
+     "url": "https://www.cncf.io/projects/opentelemetry/",
+     "label": "CNCF: OpenTelemetry"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "Which signal is best suited for following a single request across multiple microservices?",
+   "options": [
+    "Metrics",
+    "Logs",
+    "Traces",
+    "Baggage"
+   ],
+   "answer": 2,
+   "explain": "Traces capture the causal, cross-service path of one request. Metrics aggregate; logs are local detail; baggage is context, not a signal.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+     "label": "Traces"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/",
+     "label": "Trace API spec"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "Which signal is currently experimental / still in development in OpenTelemetry?",
+   "options": [
+    "Traces",
+    "Metrics",
+    "Logs",
+    "Profiles"
+   ],
+   "answer": 3,
+   "explain": "Profiles are the emerging fourth signal. Traces, metrics and the logs data model/SDK are stable.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/",
+     "label": "Signals overview"
+    },
+    {
+     "url": "https://opentelemetry.io/blog/2024/profiling/",
+     "label": "Profiling in OpenTelemetry"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "What is an exemplar?",
+   "options": [
+    "A template Collector configuration file",
+    "A sample data point on a metric carrying a TraceId/SpanId that links to a representative trace",
+    "A reference implementation of the API",
+    "A required attribute in semantic conventions"
+   ],
+   "answer": 1,
+   "explain": "Exemplars are the metrics-to-traces bridge: from a latency spike on a chart straight into a slow trace.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/data-model/#exemplars",
+     "label": "Metrics data model: exemplars"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "A team records the raw user ID as an attribute on a request-count metric. Most likely consequence?",
+   "options": [
+    "Nothing; metrics ignore attributes",
+    "A cardinality explosion: one time series per user, driving up backend cost",
+    "The SDK refuses to start",
+    "Traces stop being sampled"
+   ],
+   "answer": 1,
+   "explain": "Each unique attribute combination is a separate time series. Remedies: SDK Views or Collector transform/attributes processors.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics & cardinality"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk/#view",
+     "label": "Views (cardinality control)"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "What is the primary purpose of semantic conventions?",
+   "options": [
+    "Encrypt attribute values in transit",
+    "Standardize attribute names/values so any backend or tool can interpret telemetry uniformly",
+    "Reduce network bandwidth",
+    "Enforce sampling rates"
+   ],
+   "answer": 1,
+   "explain": "A shared vocabulary (http.request.method, service.name...) enables portable dashboards and OTel-aware processing.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/semantic-conventions/",
+     "label": "Semantic conventions"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/semconv/",
+     "label": "Semantic conventions spec"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "The strongest strategy for correlating a log line with the request that produced it is:",
+   "options": [
+    "Matching timestamps",
+    "Matching hostnames",
+    "Stamping the log record with the active span's TraceId/SpanId",
+    "Matching log text against span names"
+   ],
+   "answer": 2,
+   "explain": "Identity beats time: logs emitted inside an active span get exact trace/span IDs.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/logs/",
+     "label": "Logs & trace correlation"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/logs/",
+     "label": "Logs spec"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "Which value proposition is central to OpenTelemetry?",
+   "options": [
+    "It replaces the need for observability backends",
+    "Instrument once, export to any compatible backend - no vendor lock-in at the instrumentation layer",
+    "It guarantees 100% sampling with zero overhead",
+    "It only works with CNCF backends"
+   ],
+   "answer": 1,
+   "explain": "Vendor neutrality: swap backends without re-instrumenting your code.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+     "label": "What is OpenTelemetry?"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/components/",
+     "label": "OTel components"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "High-cardinality data such as request IDs and full URLs is best placed on:",
+   "options": [
+    "Metric attributes",
+    "Span and log attributes",
+    "Resource attributes",
+    "Baggage only"
+   ],
+   "answer": 1,
+   "explain": "Spans and logs tolerate high cardinality (they are sampled/filtered); metrics do not. Resource attributes describe the producer.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/semantic-conventions/",
+     "label": "Semantic conventions"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/semconv/general/attribute-naming/",
+     "label": "Attribute naming"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "The RED method tracks which three things per service?",
+   "options": [
+    "Retries, Errors, Downtime",
+    "Rate, Errors, Duration",
+    "Requests, Endpoints, Databases",
+    "Resources, Events, Dependencies"
+   ],
+   "answer": 1,
+   "explain": "RED = request Rate, Error rate, Duration - typically derived from spans or HTTP histograms. USE (Utilization, Saturation, Errors) covers resources.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics (RED / USE)"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector",
+     "label": "spanmetrics connector"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "Which backend is a typical destination for TRACES exported from OpenTelemetry?",
+   "options": [
+    "Prometheus",
+    "Jaeger",
+    "Loki",
+    "Fluentd"
+   ],
+   "answer": 1,
+   "explain": "Jaeger (and Tempo, Zipkin) store traces; Prometheus stores metrics; Loki stores logs. Grafana visualizes all of them.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+     "label": "Traces & trace backends"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/components/",
+     "label": "OTel components"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "Baggage is best described as:",
+   "options": [
+    "The fourth telemetry signal",
+    "Cross-cutting key/value context propagated with a request, separate from the signals",
+    "The Collector's internal queue",
+    "A compression format"
+   ],
+   "answer": 1,
+   "explain": "Baggage is propagated context, not a signal - and it is not automatically attached to any telemetry.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/baggage/",
+     "label": "Baggage"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/baggage/api/",
+     "label": "Baggage API spec"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "What is OpenTelemetry's status within the CNCF?",
+   "options": [
+    "Sandbox project",
+    "Incubating project",
+    "Graduated and archived",
+    "A commercial product"
+   ],
+   "answer": 1,
+   "explain": "OTel is a CNCF incubating project and one of the most active CNCF projects, second only to Kubernetes by contributors.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/what-is-opentelemetry/",
+     "label": "OpenTelemetry & the CNCF"
+    },
+    {
+     "url": "https://www.cncf.io/projects/opentelemetry/",
+     "label": "CNCF: OpenTelemetry"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Why are the OpenTelemetry API and SDK separate?",
+   "options": [
+    "To support multiple wire protocols",
+    "So library authors can instrument against the API with zero runtime cost when no SDK is configured - API calls become no-ops",
+    "Because the API is written in Go",
+    "To allow different license models"
+   ],
+   "answer": 1,
+   "explain": "Without a registered SDK the API is a no-op with negligible cost. A recurring exam theme.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/components/",
+     "label": "OTel components: API & SDK"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/overview/",
+     "label": "OTel spec overview"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which dependency should a shared open-source library declare to add OTel instrumentation?",
+   "options": [
+    "The full SDK",
+    "The API only",
+    "The Collector",
+    "An OTLP exporter"
+   ],
+   "answer": 1,
+   "explain": "Libraries depend on the API only; the application decides whether to wire in an SDK.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/instrumentation/libraries/",
+     "label": "Instrumenting libraries"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/instrumentation/",
+     "label": "Instrumentation"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What are the sizes of a TraceId and a SpanId?",
+   "options": [
+    "8 bytes / 4 bytes",
+    "16 bytes / 8 bytes",
+    "32 bytes / 16 bytes",
+    "Both 16 bytes"
+   ],
+   "answer": 1,
+   "explain": "TraceId = 16 bytes (32 hex chars); SpanId = 8 bytes (16 hex chars).",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/#spancontext",
+     "label": "Trace API: SpanContext"
+    },
+    {
+     "url": "https://www.w3.org/TR/trace-context/",
+     "label": "W3C Trace Context"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which span kind should an HTTP service handling an inbound request use?",
+   "options": [
+    "INTERNAL",
+    "CLIENT",
+    "SERVER",
+    "CONSUMER"
+   ],
+   "answer": 2,
+   "explain": "SERVER for inbound remote calls, CLIENT for outbound, PRODUCER/CONSUMER for messaging, INTERNAL otherwise.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/#spankind",
+     "label": "Trace API: SpanKind"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+     "label": "Traces (span kind)"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "A server span for a request that returned HTTP 404 should have status:",
+   "options": [
+    "ERROR, because 4xx is a failure",
+    "OK, always set explicitly",
+    "UNSET - 4xx does not automatically mark a server span as error",
+    "DROPPED"
+   ],
+   "answer": 2,
+   "explain": "By convention 5xx sets ERROR on server spans; 4xx does not (the server behaved correctly). On CLIENT spans 4xx is an error.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/semconv/http/http-spans/",
+     "label": "HTTP span conventions"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/semconv/http/",
+     "label": "HTTP semantic conventions"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "A consumer processes one batch containing messages from 50 different producer traces. How should its span reference them?",
+   "options": [
+    "50 parent spans",
+    "Span links to the producer spans",
+    "50 span events",
+    "Baggage entries"
+   ],
+   "answer": 1,
+   "explain": "Span links express causal relations that are not parent-child - the canonical batch/fan-in case. A span has at most one parent.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/traces/#span-links",
+     "label": "Span links"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/",
+     "label": "Trace API spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which is a good span name?",
+   "options": [
+    "GET https://shop.example.com/users/8871?src=email",
+    "GET /users/{id}",
+    "request-8f31c2",
+    "span1"
+   ],
+   "answer": 1,
+   "explain": "Span names must be low-cardinality templates; concrete URLs and IDs go into attributes such as url.full.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/#span",
+     "label": "Trace API: span names"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/semconv/http/",
+     "label": "HTTP semantic conventions"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which instrument fits 'number of items currently in a queue' (goes up and down, additive)?",
+   "options": [
+    "Counter",
+    "UpDownCounter",
+    "Histogram",
+    "Gauge"
+   ],
+   "answer": 1,
+   "explain": "Additive but can decrease -> UpDownCounter. Counter is monotonic-only.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/api/#updowncounter",
+     "label": "Metrics API: UpDownCounter"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which instrument fits 'CPU temperature', where summing values across sensors is meaningless?",
+   "options": [
+    "Counter",
+    "UpDownCounter",
+    "Gauge",
+    "Histogram"
+   ],
+   "answer": 2,
+   "explain": "Use a Gauge precisely when addition makes no sense - a non-additive sampled value.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge",
+     "label": "Metrics API: Gauge"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which instrument should record HTTP request duration so percentiles can be computed?",
+   "options": [
+    "Counter",
+    "Gauge",
+    "Histogram",
+    "UpDownCounter"
+   ],
+   "answer": 2,
+   "explain": "Histograms capture the distribution, enabling percentiles/heatmaps and (with exemplars) trace drill-down.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/api/#histogram",
+     "label": "Metrics API: Histogram"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "How do asynchronous (observable) instruments report values?",
+   "options": [
+    "The app calls add()/record() on every event",
+    "Via a callback the SDK invokes at each collection cycle",
+    "Through baggage propagation",
+    "They are pushed by the Collector"
+   ],
+   "answer": 1,
+   "explain": "Observable instruments register callbacks read at collection time - ideal for values you read on demand (CPU, queue depth).",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/api/#asynchronous-counter",
+     "label": "Async (observable) instruments"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk/",
+     "label": "Metrics SDK spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Prometheus as a backend requires which metric temporality?",
+   "options": [
+    "Delta",
+    "Cumulative",
+    "Either, per data point",
+    "None; Prometheus is trace-only"
+   ],
+   "answer": 1,
+   "explain": "Prometheus's model is cumulative. Temporality is configured per exporter; several SaaS backends prefer delta.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/data-model/#temporality",
+     "label": "Metrics temporality"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/prometheus/",
+     "label": "Prometheus exporter (SDK)"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "The primary SDK tool for dropping a high-cardinality attribute from one metric without changing recording code is:",
+   "options": [
+    "A Sampler",
+    "A View",
+    "A Propagator",
+    "A Resource detector"
+   ],
+   "answer": 1,
+   "explain": "A View selects an instrument and can allow-list attribute keys, change aggregation, rename, or drop the stream entirely.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk/#view",
+     "label": "Metrics SDK: Views"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+     "label": "Metrics & cardinality"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What is the recommended way for an application to emit OpenTelemetry logs?",
+   "options": [
+    "Replace the logging library with direct Logs Bridge API calls everywhere",
+    "Keep the existing logger and attach an OTel appender/bridge that forwards records into the LoggerProvider",
+    "Write JSON to stdout",
+    "Send syslog directly to the backend"
+   ],
+   "answer": 1,
+   "explain": "The bridge model: keep log4j/logback/slog/etc.; OTel forwards and enriches its records. The Bridge API is for appender authors.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/logs/",
+     "label": "Logs & the log bridge"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/logs/",
+     "label": "Logs spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "A LogRecord has severity_number 17. Which severity block is that?",
+   "options": [
+    "WARN",
+    "ERROR",
+    "FATAL",
+    "INFO"
+   ],
+   "answer": 1,
+   "explain": "Blocks of four: TRACE 1-4, DEBUG 5-8, INFO 9-12, WARN 13-16, ERROR 17-20, FATAL 21-24.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/logs/data-model/#field-severitynumber",
+     "label": "Logs data model: SeverityNumber"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/logs/",
+     "label": "Logs spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Logs reach the backend but carry no trace IDs although requests are traced. Most likely cause?",
+   "options": [
+    "The backend strips them",
+    "The OTel log appender/bridge is not installed, or the logs are emitted outside an active span",
+    "Sampling removed the IDs",
+    "The traceparent header is too long"
+   ],
+   "answer": 1,
+   "explain": "Correlation requires the bridge plus an active span in context at emit time.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/logs/",
+     "label": "Log-trace correlation"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/logs/",
+     "label": "Logs spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What does a Resource describe?",
+   "options": [
+    "The request currently in flight",
+    "The immutable identity of the telemetry producer (service, host, pod, cloud), attached to all signals",
+    "Available CPU for the SDK",
+    "The exporter destination"
+   ],
+   "answer": 1,
+   "explain": "The Resource is what makes signals from one workload correlatable; service.name is its most critical key.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/resources/",
+     "label": "Resources"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/",
+     "label": "Resource env vars"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which environment variable sets service.name?",
+   "options": [
+    "OTEL_SERVICE_NAME",
+    "OTEL_TRACES_EXPORTER",
+    "OTEL_SDK_NAME",
+    "SERVICE_NAME"
+   ],
+   "answer": 0,
+   "explain": "OTEL_SERVICE_NAME - it also overrides a service.name given inside OTEL_RESOURCE_ATTRIBUTES.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration",
+     "label": "SDK env vars: service name"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/resources/",
+     "label": "Resources"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What are OpenTelemetry's default context propagators?",
+   "options": [
+    "B3 and Jaeger",
+    "W3C Trace Context and W3C Baggage",
+    "AWS X-Ray only",
+    "gRPC metadata only"
+   ],
+   "answer": 1,
+   "explain": "Defaults: traceparent/tracestate + the baggage header. B3, Jaeger and X-Ray are opt-in via OTEL_PROPAGATORS.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/context-propagation/",
+     "label": "Context propagation"
+    },
+    {
+     "url": "https://www.w3.org/TR/trace-context/",
+     "label": "W3C Trace Context"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "In traceparent: 00-4bf9...4736-00f0...02b7-01, what does the trailing 01 mean?",
+   "options": [
+    "Protocol version 1",
+    "The trace has one span",
+    "The sampled flag is set",
+    "Priority routing"
+   ],
+   "answer": 2,
+   "explain": "The last field is the flags byte; 01 = sampled bit set, carrying the head-sampling decision downstream.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/context-propagation/",
+     "label": "Context propagation: traceparent"
+    },
+    {
+     "url": "https://www.w3.org/TR/trace-context/",
+     "label": "W3C Trace Context"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Service A (tracecontext) calls service B configured with only the B3 propagator. Result?",
+   "options": [
+    "B converts the headers automatically",
+    "The trace breaks: B cannot extract A's context and starts a new trace",
+    "B crashes",
+    "Baggage still links the spans"
+   ],
+   "answer": 1,
+   "explain": "Propagator mismatch is the #1 cause of broken traces. Fix by listing both formats on both sides (OTEL_PROPAGATORS=tracecontext,baggage,b3).",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/context-propagation/",
+     "label": "Context propagation: propagators"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/context/api-propagators/",
+     "label": "Propagators API spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What is Baggage for?",
+   "options": [
+    "Compressing OTLP payloads",
+    "Propagating application-defined key/value context (tenant ID, feature flag) across service boundaries",
+    "Storing span events",
+    "Batching log records"
+   ],
+   "answer": 1,
+   "explain": "Baggage carries app context in-band; it is not automatically attached to spans, metrics or logs.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/baggage/",
+     "label": "Baggage"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/baggage/api/",
+     "label": "Baggage API spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "A key caution when using Baggage:",
+   "options": [
+    "It is encrypted, so debugging is hard",
+    "It is sent as plain-text headers to every downstream service - never put secrets or PII in it",
+    "It can hold only integers",
+    "It disables sampling"
+   ],
+   "answer": 1,
+   "explain": "Baggage travels with every hop, potentially to third parties; also mind cardinality if copied onto metrics.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/signals/baggage/",
+     "label": "Baggage cautions"
+    },
+    {
+     "url": "https://www.w3.org/TR/baggage/",
+     "label": "W3C Baggage"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Why is BatchSpanProcessor preferred over SimpleSpanProcessor in production?",
+   "options": [
+    "It compresses spans with gzip",
+    "It exports asynchronously in batches with a bounded queue, so a slow exporter never blocks the app",
+    "It samples spans",
+    "It converts spans to metrics"
+   ],
+   "answer": 1,
+   "explain": "SimpleSpanProcessor exports synchronously per span - fine for dev, dangerous in prod.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/#batching-processor",
+     "label": "Span processors: batching"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/",
+     "label": "Trace SDK spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which sampler is the production standard for consistent whole-trace decisions plus a fixed root rate?",
+   "options": [
+    "AlwaysOn",
+    "ParentBased(TraceIdRatioBased)",
+    "AlwaysOff",
+    "SimpleSampler"
+   ],
+   "answer": 1,
+   "explain": "ParentBased honors the parent's decision; TraceIdRatioBased at the root gives a known rate; the decision rides in traceparent flags.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/sampling/",
+     "label": "Sampling"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/",
+     "label": "Trace SDK spec (samplers)"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "'Keep every trace with an error or >500 ms latency, sample 5% of the rest.' Where must this run?",
+   "options": [
+    "SDK head sampler",
+    "Collector tail_sampling processor - only tail sampling sees whole-trace properties",
+    "A resource detector",
+    "The Prometheus exporter"
+   ],
+   "answer": 1,
+   "explain": "Final latency and status do not exist at span start, so head sampling cannot act on them.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/sampling/",
+     "label": "Sampling: head vs tail"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor",
+     "label": "tail_sampling processor"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "OTLP over plain HTTP for traces uses, by default:",
+   "options": [
+    "Port 4317, path /traces",
+    "Port 4318, path /v1/traces",
+    "Port 8888, path /v1/spans",
+    "Port 9464, path /api/traces"
+   ],
+   "answer": 1,
+   "explain": "OTLP/HTTP: 4318 with /v1/traces, /v1/metrics, /v1/logs. 4317 is OTLP/gRPC.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otlp/",
+     "label": "OTLP specification"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/protocol/exporter/",
+     "label": "OTLP exporter config"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "An app exits right after its last request and recent spans never arrive. Most likely fix?",
+   "options": [
+    "Increase sampling ratio",
+    "Call shutdown()/forceFlush() on the providers so batched data is exported before exit",
+    "Switch to gRPC",
+    "Disable the memory limiter"
+   ],
+   "answer": 1,
+   "explain": "Batched telemetry sits in in-memory queues; without shutdown/flush it is lost on exit.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/#shutdown",
+     "label": "SDK shutdown & flush"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/",
+     "label": "Trace SDK spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What is an instrumentation scope?",
+   "options": [
+    "The Kubernetes namespace of the workload",
+    "The name+version identity (typically of a library) passed to getTracer/getMeter, grouping the telemetry it emits",
+    "A firewall rule for the Collector",
+    "The set of sampled traces"
+   ],
+   "answer": 1,
+   "explain": "tracer = getTracer(\"shop.checkout\", \"1.4.2\") sets the scope; in OTLP data is grouped Resource -> Scope -> records.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/instrumentation-scope/",
+     "label": "Instrumentation scope"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "Which environment variable turns the whole SDK into a no-op (kill switch)?",
+   "options": [
+    "OTEL_TRACES_SAMPLER=always_off",
+    "OTEL_SDK_DISABLED=true",
+    "OTEL_EXPORTER=none",
+    "OTEL_KILL=1"
+   ],
+   "answer": 1,
+   "explain": "OTEL_SDK_DISABLED=true disables the SDK entirely; a sampler of always_off would still leave metrics and logs active.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#general-sdk-configuration",
+     "label": "SDK env vars: disable"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/languages/",
+     "label": "Language SDKs"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What is the default limit for the number of attributes on a single span?",
+   "options": [
+    "16",
+    "64",
+    "128",
+    "Unlimited"
+   ],
+   "answer": 2,
+   "explain": "Span limits (default 128 attributes, plus configurable event/link counts and value lengths) protect the SDK from runaway memory.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/sdk/#span-limits",
+     "label": "Span limits"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/",
+     "label": "Trace API spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "recordException(e) on a span does what?",
+   "options": [
+    "Sets the span status to OK",
+    "Adds a timestamped 'exception' span event with exception details",
+    "Creates a child span",
+    "Sends the exception to the Collector immediately"
+   ],
+   "answer": 1,
+   "explain": "recordException adds an exception event; setting status=ERROR is a separate, explicit call.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/trace/api/#record-exception",
+     "label": "Trace API: record exception"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/semconv/",
+     "label": "Exception conventions"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "In the OTLP payload hierarchy, spans are grouped as:",
+   "options": [
+    "Span -> ScopeSpans -> ResourceSpans",
+    "ResourceSpans -> ScopeSpans -> Span",
+    "TraceSpans -> ServiceSpans -> Span",
+    "Batch -> Span -> Resource"
+   ],
+   "answer": 1,
+   "explain": "Data is grouped first by Resource, then by InstrumentationScope, then the records - same shape for metrics and logs.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otlp/",
+     "label": "OTLP payload structure"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/protocol/exporter/",
+     "label": "OTLP exporter config"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What is the default metrics export interval of the PeriodicExportingMetricReader?",
+   "options": [
+    "1 second",
+    "10 seconds",
+    "60 seconds",
+    "5 minutes"
+   ],
+   "answer": 2,
+   "explain": "60000 ms by default, changeable via OTEL_METRIC_EXPORT_INTERVAL.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk/#periodic-exporting-metricreader",
+     "label": "PeriodicExportingMetricReader"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk/",
+     "label": "Metrics SDK spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "How does the Prometheus exporter in the SDK differ from the OTLP metrics exporter?",
+   "options": [
+    "It is push-based like OTLP",
+    "It exposes an HTTP endpoint that Prometheus scrapes (pull), instead of pushing",
+    "It only supports histograms",
+    "It requires the Collector"
+   ],
+   "answer": 1,
+   "explain": "OTLP metrics are pushed on an interval; the Prometheus exporter is pull/scrape-based with cumulative temporality.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/prometheus/",
+     "label": "Prometheus exporter (SDK)"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/",
+     "label": "Metrics spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "For work scheduled onto another thread or task, trace continuity requires:",
+   "options": [
+    "Nothing; context is global",
+    "Capturing the current Context when scheduling and restoring it inside the worker",
+    "Using baggage instead of spans",
+    "A tail sampler"
+   ],
+   "answer": 1,
+   "explain": "Context is thread-/async-local; capture-and-restore is the standard pattern for background work.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/context-propagation/",
+     "label": "Context propagation: async"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/context/api-propagators/",
+     "label": "Context API spec"
+    }
+   ]
+  },
+  {
+   "domain": 2,
+   "q": "What does the tracestate header carry?",
+   "options": [
+    "The span name",
+    "Vendor-/participant-specific key-value tracing state alongside traceparent",
+    "The sampled bit",
+    "Resource attributes"
+   ],
+   "answer": 1,
+   "explain": "tracestate lets tracing systems attach their own state to the W3C context; the sampled bit lives in traceparent flags.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/concepts/context-propagation/",
+     "label": "Context propagation: tracestate"
+    },
+    {
+     "url": "https://www.w3.org/TR/trace-context/",
+     "label": "W3C Trace Context"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "In a Collector pipeline, what is the correct data flow?",
+   "options": [
+    "Exporter -> Processor -> Receiver",
+    "Receiver -> Processor(s) -> Exporter",
+    "Processor -> Receiver -> Exporter",
+    "Receiver -> Exporter -> Processor"
+   ],
+   "answer": 1,
+   "explain": "Receivers get data in, processors transform it in an ordered chain, exporters send it out. That chain is a pipeline, one per signal type.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/architecture/",
+     "label": "Collector architecture"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/",
+     "label": "Collector configuration"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "What distinguishes a Connector from a Processor?",
+   "options": [
+    "Connectors run outside the data path",
+    "A connector acts as an exporter in one pipeline and a receiver in another, and may change signal type",
+    "Processors can export to backends",
+    "Connectors only work with logs"
+   ],
+   "answer": 1,
+   "explain": "Connectors bridge pipelines (e.g. spans -> metrics via spanmetrics); processors stay inside one pipeline.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/#connectors",
+     "label": "Collector connectors"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which component category is NOT on the telemetry data path?",
+   "options": [
+    "Receivers",
+    "Extensions",
+    "Processors",
+    "Connectors"
+   ],
+   "answer": 1,
+   "explain": "Extensions (health_check, pprof, zpages, file_storage, auth) add side capabilities without touching data.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/#extensions",
+     "label": "Collector extensions"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Why must memory_limiter be the first processor?",
+   "options": [
+    "YAML requires alphabetical order",
+    "So it can refuse data before downstream processors allocate more memory under pressure",
+    "It must run after batch",
+    "It only works on receivers"
+   ],
+   "answer": 1,
+   "explain": "Placed later it cannot prevent the OOM it exists to stop. When it trips, receivers return errors upstream (backpressure).",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md",
+     "label": "memory_limiter processor"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/",
+     "label": "Collector configuration"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Where does the batch processor belong in the chain?",
+   "options": [
+    "First",
+    "Immediately after receivers",
+    "Last, just before exporters",
+    "Anywhere"
+   ],
+   "answer": 2,
+   "explain": "Batch last, so only surviving, fully-enriched data is batched. Canonical order: memory_limiter -> enrichment -> filter/transform -> batch.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/batchprocessor/README.md",
+     "label": "batch processor"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/",
+     "label": "Collector configuration"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "A receiver is defined under receivers: but telemetry never arrives. Config is valid YAML. Most likely cause?",
+   "options": [
+    "The receiver is not referenced in any pipeline under service.pipelines",
+    "Receivers need a license key",
+    "The batch processor is missing",
+    "Extensions are disabled"
+   ],
+   "answer": 0,
+   "explain": "Defining a component only declares it; it activates when listed in a service.pipelines entry. Classic trick question.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/#service",
+     "label": "Collector service & pipelines"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/#pipelines",
+     "label": "Pipelines"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which processor attaches pod, namespace and deployment metadata in Kubernetes?",
+   "options": [
+    "resourcedetection/system",
+    "k8sattributes",
+    "batch",
+    "filter"
+   ],
+   "answer": 1,
+   "explain": "k8sattributes queries the K8s API and attaches k8s.pod.name, k8s.namespace.name, deployment, node as resource attributes.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor",
+     "label": "k8sattributes processor"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which pair makes an exporter's queued data survive Collector restarts?",
+   "options": [
+    "sending_queue with a file_storage extension as its storage",
+    "retry_on_failure + debug exporter",
+    "zpages + pprof",
+    "memory_limiter + batch"
+   ],
+   "answer": 0,
+   "explain": "sending_queue.storage: file_storage persists the queue to disk; retry_on_failure alone is memory-only and lost on restart.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/exporterhelper/README.md",
+     "label": "Exporter queue & persistence"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/",
+     "label": "Collector configuration"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Difference between otelcol (core) and otelcol-contrib?",
+   "options": [
+    "Core is paid, contrib is free",
+    "Contrib bundles many community receivers/processors/exporters beyond the minimal stable core set",
+    "Core supports only logs",
+    "Contrib cannot run in Kubernetes"
+   ],
+   "answer": 1,
+   "explain": "Contrib adds prometheus, kafka, k8sattributes, tail_sampling, vendor exporters and much more.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/distributions/",
+     "label": "Collector distributions"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/custom-collector/",
+     "label": "Custom collector (OCB)"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "What is the OpenTelemetry Collector Builder (OCB) for?",
+   "options": [
+    "Building dashboards",
+    "Compiling a custom Collector binary containing only the components you select",
+    "Generating instrumentation code",
+    "Load testing pipelines"
+   ],
+   "answer": 1,
+   "explain": "A custom distribution means a smaller binary and smaller attack surface.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/custom-collector/",
+     "label": "OCB: custom collector"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/distributions/",
+     "label": "Collector distributions"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which deployment pattern is the most common production topology?",
+   "options": [
+    "SDK direct-to-backend everywhere",
+    "Gateway only",
+    "Agent (per host/pod) chained to a central Gateway tier",
+    "One global sidecar"
+   ],
+   "answer": 2,
+   "explain": "Agents give local enrichment and a fast export target; the gateway centralizes auth, tail sampling, routing and fan-out.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/deployment/",
+     "label": "Collector deployment patterns"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/deployment/agent/",
+     "label": "Agent deployment"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/deployment/gateway/",
+     "label": "Gateway deployment"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "You scale Collector replicas horizontally and tail sampling starts making wrong decisions. Why?",
+   "options": [
+    "Tail sampling requires GPU",
+    "Spans of one trace now land on different replicas, so no replica sees the whole trace",
+    "The load balancer strips attributes",
+    "Sampling only works with one exporter"
+   ],
+   "answer": 1,
+   "explain": "tail_sampling is stateful: it needs every span of a trace on the same instance.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/scaling/",
+     "label": "Scaling the Collector"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/loadbalancingexporter/README.md",
+     "label": "loadbalancing exporter"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "The standard fix for scattered traces with tail sampling is:",
+   "options": [
+    "Disable sampling",
+    "A front tier using the loadbalancing exporter (routing_key: traceID) sending to a back tier that runs tail_sampling",
+    "Sticky HTTP sessions on the app LB",
+    "Running the Collector as root"
+   ],
+   "answer": 1,
+   "explain": "Consistent hashing on TraceId guarantees all spans of a trace hit the same back-tier instance. Same idea applies to spanmetrics (often keyed on service).",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/exporter/loadbalancingexporter/README.md",
+     "label": "loadbalancing exporter"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor",
+     "label": "tail_sampling processor"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which connector derives RED metrics (rate, errors, duration) from spans?",
+   "options": [
+    "servicegraph",
+    "spanmetrics",
+    "count",
+    "forward"
+   ],
+   "answer": 1,
+   "explain": "spanmetrics emits request counts, error counts and duration histograms from spans; servicegraph builds topology edge metrics.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector",
+     "label": "spanmetrics connector"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/servicegraphconnector",
+     "label": "servicegraph connector"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which language do the transform and filter processors use for statements like delete_key(attributes, \"http.user_agent\")?",
+   "options": [
+    "PromQL",
+    "OTTL (OpenTelemetry Transformation Language)",
+    "JSONPath",
+    "Rego"
+   ],
+   "answer": 1,
+   "explain": "OTTL statements run against contexts (resource, scope, span, spanevent, metric, datapoint, log).",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/transforming-telemetry/",
+     "label": "Transforming telemetry (OTTL)"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/",
+     "label": "Collector configuration"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which receiver would you use to ingest log files written to disk by a legacy application?",
+   "options": [
+    "otlp",
+    "filelog",
+    "hostmetrics",
+    "zipkin"
+   ],
+   "answer": 1,
+   "explain": "The filelog receiver tails and parses files - the standard path for logs from apps you cannot instrument.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver",
+     "label": "filelog receiver"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "The Collector's prometheus receiver works by:",
+   "options": [
+    "Accepting remote-write pushes only",
+    "Scraping Prometheus-format /metrics endpoints (pull), like Prometheus itself",
+    "Reading Prometheus's TSDB files",
+    "Converting spans to metrics"
+   ],
+   "answer": 1,
+   "explain": "Receivers can be push- or pull-based; the prometheus receiver pulls scrape targets. prometheusremotewrite is the push EXPORTER counterpart.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver",
+     "label": "prometheus receiver"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which exporter pushes metrics into a Prometheus-compatible backend rather than exposing a scrape endpoint?",
+   "options": [
+    "prometheus",
+    "prometheusremotewrite",
+    "debug",
+    "file"
+   ],
+   "answer": 1,
+   "explain": "prometheus (exporter) exposes an endpoint to be scraped; prometheusremotewrite actively pushes.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusremotewriteexporter",
+     "label": "prometheusremotewrite exporter"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which processor performs head-style percentage sampling at the Collector?",
+   "options": [
+    "tail_sampling",
+    "probabilistic_sampler",
+    "batch",
+    "resource"
+   ],
+   "answer": 1,
+   "explain": "probabilistic_sampler samples by percentage without buffering whole traces; tail_sampling is the policy-based whole-trace option.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/probabilisticsamplerprocessor",
+     "label": "probabilistic_sampler processor"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor",
+     "label": "tail_sampling (contrast)"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "The OpenTelemetry Operator's OpenTelemetryCollector CRD supports which deployment modes?",
+   "options": [
+    "deployment only",
+    "deployment, daemonset, statefulset, sidecar",
+    "job and cronjob",
+    "helm and kustomize"
+   ],
+   "answer": 1,
+   "explain": "Four modes; the Instrumentation CRD separately auto-injects language agents via pod annotations.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/kubernetes/operator/",
+     "label": "OpenTelemetry Operator"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "In Kubernetes, which Operator feature shards Prometheus scrape targets across Collector replicas?",
+   "options": [
+    "HorizontalPodAutoscaler",
+    "TargetAllocator",
+    "PodDisruptionBudget",
+    "kube-proxy"
+   ],
+   "answer": 1,
+   "explain": "The TargetAllocator distributes scrape targets so the (stateful) prometheus receiver can scale horizontally.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/kubernetes/operator/target-allocator/",
+     "label": "Target Allocator"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Using a Collector between apps and backends gives all of the following EXCEPT:",
+   "options": [
+    "Central PII redaction before egress",
+    "Fan-out to multiple backends",
+    "Automatic code instrumentation of the application",
+    "Insulating apps from backend/endpoint changes"
+   ],
+   "answer": 2,
+   "explain": "The Collector processes telemetry in transit; generating telemetry is the job of SDKs, instrumentation libraries and agents.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/",
+     "label": "Why use a Collector"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/deployment/",
+     "label": "Deployment patterns"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Which OTTL statement redacts an API key inside url.full?",
+   "options": [
+    "drop(url.full)",
+    "replace_pattern(attributes[\"url.full\"], \"(api_key=)[^&]+\", \"$$1REDACTED\")",
+    "encrypt(attributes[\"url.full\"])",
+    "sample(url.full, 0.5)"
+   ],
+   "answer": 1,
+   "explain": "replace_pattern does regex substitution in the transform processor - the canonical in-pipeline redaction example.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/transforming-telemetry/",
+     "label": "Transforming telemetry (OTTL)"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/",
+     "label": "Collector configuration"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "Multiple pipelines for the same signal type in one Collector are:",
+   "options": [
+    "Impossible",
+    "Allowed, using named pipelines like traces/tenant-a and traces/tenant-b",
+    "Allowed only for logs",
+    "Only possible with two Collector binaries"
+   ],
+   "answer": 1,
+   "explain": "type/name syntax applies to pipelines and components; one receiver can feed many pipelines and exporters can be shared.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/configuration/#pipelines",
+     "label": "Collector pipelines"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "Quickest way to verify what telemetry a Collector is actually receiving?",
+   "options": [
+    "Add the debug exporter to the pipeline and watch stdout",
+    "Restart the Collector",
+    "Enable TLS",
+    "Delete the batch processor"
+   ],
+   "answer": 0,
+   "explain": "The debug exporter (successor to the deprecated logging exporter; verbosity basic/normal/detailed) prints incoming data - the fastest ground truth.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/debugexporter/README.md",
+     "label": "debug exporter"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/troubleshooting/",
+     "label": "Troubleshooting"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "Rising otelcol_exporter_send_failed_spans plus a growing sending queue most likely indicates:",
+   "options": [
+    "The receiver port is wrong",
+    "The downstream backend is unreachable or unhealthy; the exporter is retrying",
+    "memory_limiter is misordered",
+    "Semantic conventions changed"
+   ],
+   "answer": 1,
+   "explain": "exporter_send_failed_* + queue growth = outbound trouble; retries and (persistent) queues absorb it until the backend recovers.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/internal-telemetry/",
+     "label": "Collector internal telemetry"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/troubleshooting/",
+     "label": "Troubleshooting"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "otelcol_processor_refused_spans is climbing during a traffic spike. Most likely source?",
+   "options": [
+    "The debug exporter",
+    "memory_limiter rejecting data because memory crossed its threshold",
+    "zpages extension",
+    "A missing schema_url"
+   ],
+   "answer": 1,
+   "explain": "processor_refused/dropped_* under load is typically memory_limiter shedding; backpressure propagates to senders via receiver errors.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/internal-telemetry/",
+     "label": "Collector internal telemetry"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/troubleshooting/",
+     "label": "Troubleshooting"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "Which extension provides liveness/readiness endpoints for Kubernetes probes?",
+   "options": [
+    "pprof",
+    "zpages",
+    "health_check",
+    "file_storage"
+   ],
+   "answer": 2,
+   "explain": "health_check (default :13133). pprof (:1777) = Go profiling; zpages (:55679) = live debug pages.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/healthcheckextension",
+     "label": "health_check extension"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension/zpagesextension",
+     "label": "zpages / health extensions"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "By default, where can Prometheus scrape the Collector's own internal metrics?",
+   "options": [
+    ":4317",
+    ":8888",
+    ":13133",
+    ":55679"
+   ],
+   "answer": 1,
+   "explain": "Self-metrics default to :8888. 4317 = OTLP/gRPC ingest, 13133 = health_check, 55679 = zpages.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/internal-telemetry/",
+     "label": "Collector internal telemetry (:8888)"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/collector/troubleshooting/",
+     "label": "Troubleshooting"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "A trace shows services A and C but B's spans are missing; B's SDK logs show exporter timeouts. Best first step?",
+   "options": [
+    "Change B's span names",
+    "Check B's OTLP endpoint/port/protocol configuration and network reachability to its Collector",
+    "Increase span attribute limits",
+    "Switch B to AlwaysOff sampling"
+   ],
+   "answer": 1,
+   "explain": "Exporter timeouts point to connectivity/config: endpoint, 4317 vs 4318, grpc vs http/protobuf, TLS, network policy.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/troubleshooting/",
+     "label": "Collector troubleshooting"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/",
+     "label": "SDK env vars"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "To see the SDK's own diagnostic output (exporter errors, retries) you set:",
+   "options": [
+    "OTEL_TRACES_SAMPLER=debug",
+    "OTEL_LOG_LEVEL=debug",
+    "OTEL_SDK_DISABLED=true",
+    "OTEL_DEBUG_SPANS=1"
+   ],
+   "answer": 1,
+   "explain": "OTEL_LOG_LEVEL=debug (or the language equivalent) surfaces the SDK's internal logging. Adding a console exporter confirms data is produced at all.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/",
+     "label": "SDK env vars: OTEL_LOG_LEVEL"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/languages/",
+     "label": "Language SDKs"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "An exporter receives HTTP 401 from the backend. How is this error class handled?",
+   "options": [
+    "Retried forever with backoff",
+    "Treated as permanent and dropped without retry - fix credentials",
+    "Converted to a log record",
+    "Queued to disk automatically"
+   ],
+   "answer": 1,
+   "explain": "4xx auth/format errors are permanent (retrying cannot help); 5xx/timeouts are transient and retried with exponential backoff.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otlp/",
+     "label": "OTLP failures & retries"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/protocol/exporter/",
+     "label": "OTLP exporter config"
+    }
+   ]
+  },
+  {
+   "domain": 4,
+   "q": "Which zpages page shows live traces flowing through the Collector itself?",
+   "options": [
+    "/metrics",
+    "/debug/tracez",
+    "/healthz",
+    "/v1/traces"
+   ],
+   "answer": 1,
+   "explain": "zpages serves HTML debug pages such as /debug/tracez and pipeline/receiver/exporter activity views on :55679.",
+   "docs": [
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension/zpagesextension",
+     "label": "zpages extension"
+    }
+   ]
+  },
+  {
+   "domain": 1,
+   "q": "What does the schema_url attached to a Resource or instrumentation scope tell a consumer?",
+   "options": [
+    "The network endpoint the telemetry was exported to",
+    "Which version of the OpenTelemetry semantic conventions the producer's attribute names follow",
+    "A checksum used to detect corrupted OTLP payloads",
+    "The URL of the backend's query API"
+   ],
+   "answer": 1,
+   "explain": "schema_url pins the semantic-convention version the producer used, so consumers can apply schema transformations to normalize attribute names across producers running different versions.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/schemas/",
+     "label": "Telemetry Schemas spec"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/concepts/semantic-conventions/",
+     "label": "Semantic conventions"
+    }
+   ]
+  },
+  {
+   "domain": 3,
+   "q": "A histogram's cardinality explodes right after a release. Where can you cut it WITHOUT redeploying the applications?",
+   "options": [
+    "Only by editing and redeploying the application code",
+    "In the Collector, using the transform or attributes processor to drop or hash the offending attribute key",
+    "By switching the exporter from OTLP to Prometheus",
+    "By moving the memory_limiter processor to the end of the chain"
+   ],
+   "answer": 1,
+   "explain": "The Collector's transform/attributes processors remove or hash high-cardinality keys in transit, so no app redeploy is needed. The durable fix is an SDK View at the source once you can ship the apps.",
+   "docs": [
+    {
+     "url": "https://opentelemetry.io/docs/collector/transforming-telemetry/",
+     "label": "Transforming telemetry (OTTL)"
+    },
+    {
+     "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor",
+     "label": "attributes processor"
+    },
+    {
+     "url": "https://opentelemetry.io/docs/specs/otel/metrics/sdk/#view",
+     "label": "Views (source-side fix)"
+    }
+   ]
+  }
+ ]
+}

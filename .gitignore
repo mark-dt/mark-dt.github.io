@@ -2,3 +2,6 @@
 *.json
 *.DS_Store
 *.swp
+
+# OTCA quiz question bank must be published (overrides *.json above)
+!otca-quiz/questions.json
