@@ -11,6 +11,9 @@ A collection of internal Dynatrace utilities hosted on GitHub Pages.
 | **Audit Log Analyser** | `audit-log.html` | Query Dynatrace audit logs via API, filter results, and export to CSV |
 | **Extension Configurator** | `extension-configurator.html` | Configure Dynatrace OneAgent extensions and deploy to entities |
 | **Dashboard Marketplace** | `dashboards/index.html` | Browse and deploy pre-built dashboards to a Dynatrace tenant |
+| **Backtrace Viewer** | `backtrace.html` | Import and visualize Dynatrace service backtrace JSON files as an interactive tree |
+| **PurePath Viewer** | `purepath.html` | Import and visualize Dynatrace PurePath dumps (.ppdump) as an interactive trace tree |
+| **OTCA Practice Quiz** | `otca-quiz/index.html` | Practice for the OpenTelemetry Certified Associate exam — domain drills, weak-question review, and a timed 60-question mock exam |
 
 ## Project Structure
 
@@ -18,6 +21,11 @@ A collection of internal Dynatrace utilities hosted on GitHub Pages.
 index.html                    # Landing page
 audit-log.html                # Audit Log Analyser
 extension-configurator.html   # Extension Configurator
+backtrace.html                # Backtrace Viewer
+purepath.html                 # PurePath Viewer
+otca-quiz/
+  index.html                  # OTCA Practice Quiz
+  questions.json              # Question bank (domain, options, answer, explanation, doc links)
 dashboards/
   index.html                  # Dashboard Marketplace
   js/main.js                  # Dashboard-specific utilities
